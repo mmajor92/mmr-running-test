@@ -215,6 +215,7 @@ export default function Index() {
   const [showPaceCalc, setShowPaceCalc] = useState(false);
   const [showArchiveManager, setShowArchiveManager] = useState(false);
   const [showNewPlanModal, setShowNewPlanModal] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const [newPlanName, setNewPlanName] = useState('');
   const [newStartDate, setNewStartDate] = useState('2026-07-27');
@@ -301,7 +302,6 @@ export default function Index() {
       .toFixed(1);
   }, [activePlan]);
 
-  // Helper map for Whole Plan
   const workoutsByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     activePlan.workouts.forEach((w) => {
@@ -313,7 +313,6 @@ export default function Index() {
     return weeksMap;
   }, [activePlan]);
 
-  // Helper map for Upcoming Workouts grouped by week
   const upcomingByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     upcomingWorkouts.forEach((w) => {
@@ -325,7 +324,6 @@ export default function Index() {
     return weeksMap;
   }, [upcomingWorkouts]);
 
-  // Helper map for Previous Workouts grouped by week
   const previousByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     previousWorkouts.forEach((w) => {
@@ -435,14 +433,21 @@ export default function Index() {
   const handleExportWeek = () => {
     const content = generateICSContent(currentWeekWorkouts, `${activePlan.name} - Week ${currentWeekNum}`);
     triggerICSDownload(content, `${activePlan.name}_Week_${currentWeekNum}.ics`);
+    setShowExportMenu(false);
+  };
+
+  const handleExportUpcoming = () => {
+    const content = generateICSContent(upcomingWorkouts, `${activePlan.name} - Upcoming Runs`);
+    triggerICSDownload(content, `${activePlan.name}_Upcoming_Runs.ics`);
+    setShowExportMenu(false);
   };
 
   const handleExportEntirePlan = () => {
     const content = generateICSContent(activePlan.workouts, activePlan.name);
     triggerICSDownload(content, `${activePlan.name}_Full_Plan.ics`);
+    setShowExportMenu(false);
   };
 
-  // FULL 2PX BORDER & SUBTLE TINT CATEGORY STYLES
   const getCategoryStyles = (category: Workout['category']) => {
     switch (category) {
       case 'intervals': 
@@ -512,13 +517,11 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Permanently Visible Breakdown */}
         <div className="mt-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-xs sm:text-sm text-slate-300">
           <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Breakdown</span>
           {workout.breakdown}
         </div>
 
-        {/* Optional Expanded Coach Advice & NRC Info */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-150">
             <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/50 space-y-2">
@@ -559,14 +562,45 @@ export default function Index() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={handleExportEntirePlan}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
-                  title="Export entire plan to .ics calendar"
-                >
-                  <Download className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Export iCal</span>
-                </button>
+                
+                {/* NEW EXPORT ICAL DROPDOWN MENU */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5 text-orange-400" />
+                    <span>Export iCal</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-50">
+                      <button
+                        onClick={handleExportEntirePlan}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Whole Plan</span>
+                        <Calendar className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                      <button
+                        onClick={handleExportWeek}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Current Week</span>
+                        <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                      <button
+                        onClick={handleExportUpcoming}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Upcoming Runs</span>
+                        <PlayCircle className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={() => setShowArchiveManager(!showArchiveManager)}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
@@ -601,9 +635,6 @@ export default function Index() {
                 <span className="flex items-center gap-1 text-slate-200">
                   <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
                   Week {currentWeekNum} Volume: <strong className="text-orange-400">{currentWeekKm} km</strong>
-                  <button onClick={handleExportWeek} className="ml-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-semibold inline-flex items-center gap-1">
-                    <Download className="w-2.5 h-2.5 text-orange-400" /> Export Week
-                  </button>
                 </span>
                 <span>{totalPlanCompletedKm} / {totalPlanKm} km Total Progress</span>
               </div>
@@ -617,7 +648,6 @@ export default function Index() {
           </div>
         </header>
 
-        {/* Plans Manager Drawer */}
         {showArchiveManager && (
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -673,7 +703,6 @@ export default function Index() {
           </div>
         )}
 
-        {/* In-App "Add Plan" Form Modal */}
         {showNewPlanModal && (
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
@@ -851,7 +880,7 @@ export default function Index() {
           </button>
         </div>
 
-        {/* TAB 1: UPCOMING RUNS WITH WEEK HEADERS */}
+        {/* TAB 1: UPCOMING RUNS */}
         {activeTab === 'upcoming' && (
           <div className="space-y-6">
             {Object.keys(upcomingByWeek).length > 0 ? (
@@ -889,7 +918,7 @@ export default function Index() {
           </div>
         )}
 
-        {/* TAB 2: WHOLE PLAN WITH WEEK HEADERS */}
+        {/* TAB 2: WHOLE PLAN */}
         {activeTab === 'whole' && (
           <div className="space-y-6">
             {Object.keys(workoutsByWeek)
@@ -921,7 +950,7 @@ export default function Index() {
           </div>
         )}
 
-        {/* TAB 3: PREVIOUS RUNS WITH WEEK HEADERS */}
+        {/* TAB 3: PREVIOUS RUNS */}
         {activeTab === 'previous' && (
           <div className="space-y-6">
             {Object.keys(previousByWeek).length > 0 ? (
