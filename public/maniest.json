@@ -1,9 +1,0 @@
-{
-  "short_name": "MMR Hub",
-  "name": "MMR Running Hub",
-  "start_url": "/",
-  "background_color": "#020617",
-  "theme_color": "#020617",
-  "display": "standalone",
-  "orientation": "portrait"
-}
