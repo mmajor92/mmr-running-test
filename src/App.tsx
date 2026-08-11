@@ -330,7 +330,7 @@ export default function Index() {
       }
       weeksMap[w.weekNumber].push(w);
     });
-    return weeksMap;
+    return previousWorkouts;
   }, [previousWorkouts]);
 
   const paceCalculations = useMemo(() => {
@@ -475,18 +475,18 @@ export default function Index() {
           isToday ? 'ring-2 ring-orange-500 ring-offset-2 ring-offset-slate-950' : 'hover:brightness-110'
         }`}
       >
+        {/* ROW 1: TODAY BADGE ON ITS OWN DEDICATED LINE */}
+        {isToday && (
+          <div className="mb-2">
+            <span className="inline-block text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full shadow-sm">
+              Today
+            </span>
+          </div>
+        )}
+
+        {/* ROW 2: ALL MAIN DETAILS IN A SINGLE HORIZONTAL LINE */}
         <div className="flex justify-between items-start gap-2">
           <div className="min-w-0 flex-1">
-            
-            {/* TODAY BADGE POSITIONED DIRECTLY ABOVE DATE */}
-            {isToday && (
-              <div className="mb-1">
-                <span className="inline-block text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full shadow-sm">
-                  Today
-                </span>
-              </div>
-            )}
-
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap">
               <span className="shrink-0">{workout.dayName}, {workout.displayDate}</span>
               <span className="shrink-0">•</span>
@@ -494,6 +494,7 @@ export default function Index() {
             </div>
             <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">{workout.workoutType}</div>
           </div>
+
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <span className="font-black text-orange-400 text-sm sm:text-base mr-1">{workout.totalKm}</span>
             <button
@@ -520,11 +521,13 @@ export default function Index() {
           </div>
         </div>
 
+        {/* BREAKDOWN BOX */}
         <div className="mt-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-xs sm:text-sm text-slate-300">
           <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Breakdown</span>
           {workout.breakdown}
         </div>
 
+        {/* EXPANDABLE COACH ADVICE */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-150">
             <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/50 space-y-2">
