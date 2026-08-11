@@ -446,13 +446,13 @@ export default function Index() {
   const getCategoryStyles = (category: Workout['category']) => {
     switch (category) {
       case 'intervals': 
-        return 'border-amber-500/80 bg-amber-950/20 text-amber-400';
+        return 'border-purple-500/80 bg-purple-950/20 text-purple-400'; // Changed to Purple
       case 'progression': 
         return 'border-emerald-500/80 bg-emerald-950/20 text-emerald-400';
       case 'shakeout': 
         return 'border-blue-500/80 bg-blue-950/20 text-blue-400';
       case 'longrun': 
-        return 'border-orange-500/80 bg-orange-950/20 text-orange-400';
+        return 'border-orange-500/80 bg-orange-950/20 text-orange-400'; // Stays Orange
       case 'raceday': 
         return 'border-rose-500/80 bg-rose-950/20 text-rose-400';
       default: 
