@@ -215,6 +215,7 @@ export default function Index() {
   const [showPaceCalc, setShowPaceCalc] = useState(false);
   const [showArchiveManager, setShowArchiveManager] = useState(false);
   const [showNewPlanModal, setShowNewPlanModal] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const [newPlanName, setNewPlanName] = useState('');
   const [newStartDate, setNewStartDate] = useState('2026-07-27');
@@ -301,7 +302,6 @@ export default function Index() {
       .toFixed(1);
   }, [activePlan]);
 
-  // Helper map for Whole Plan
   const workoutsByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     activePlan.workouts.forEach((w) => {
@@ -313,7 +313,6 @@ export default function Index() {
     return weeksMap;
   }, [activePlan]);
 
-  // Helper map for Upcoming Workouts grouped by week
   const upcomingByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     upcomingWorkouts.forEach((w) => {
@@ -325,7 +324,6 @@ export default function Index() {
     return weeksMap;
   }, [upcomingWorkouts]);
 
-  // Helper map for Previous Workouts grouped by week
   const previousByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
     previousWorkouts.forEach((w) => {
@@ -435,18 +433,26 @@ export default function Index() {
   const handleExportWeek = () => {
     const content = generateICSContent(currentWeekWorkouts, `${activePlan.name} - Week ${currentWeekNum}`);
     triggerICSDownload(content, `${activePlan.name}_Week_${currentWeekNum}.ics`);
+    setShowExportMenu(false);
+  };
+
+  const handleExportUpcoming = () => {
+    const content = generateICSContent(upcomingWorkouts, `${activePlan.name} - Upcoming Runs`);
+    triggerICSDownload(content, `${activePlan.name}_Upcoming_Runs.ics`);
+    setShowExportMenu(false);
   };
 
   const handleExportEntirePlan = () => {
     const content = generateICSContent(activePlan.workouts, activePlan.name);
     triggerICSDownload(content, `${activePlan.name}_Full_Plan.ics`);
+    setShowExportMenu(false);
   };
 
   // FULL 2PX BORDER & SUBTLE TINT CATEGORY STYLES
   const getCategoryStyles = (category: Workout['category']) => {
     switch (category) {
       case 'intervals': 
-        return 'border-amber-500/80 bg-amber-950/20 text-amber-400';
+        return 'border-purple-500/80 bg-purple-950/20 text-purple-400'; // High-contrast Purple for Speed/Intervals
       case 'progression': 
         return 'border-emerald-500/80 bg-emerald-950/20 text-emerald-400';
       case 'shakeout': 
@@ -559,14 +565,45 @@ export default function Index() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={handleExportEntirePlan}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
-                  title="Export entire plan to .ics calendar"
-                >
-                  <Download className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Export iCal</span>
-                </button>
+                
+                {/* EXPORT ICAL DROPDOWN MENU */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5 text-orange-400" />
+                    <span>Export iCal</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-50">
+                      <button
+                        onClick={handleExportEntirePlan}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Whole Plan</span>
+                        <Calendar className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                      <button
+                        onClick={handleExportWeek}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Current Week</span>
+                        <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                      <button
+                        onClick={handleExportUpcoming}
+                        className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
+                      >
+                        <span>Export Upcoming Runs</span>
+                        <PlayCircle className="w-3.5 h-3.5 text-orange-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={() => setShowArchiveManager(!showArchiveManager)}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
@@ -601,9 +638,6 @@ export default function Index() {
                 <span className="flex items-center gap-1 text-slate-200">
                   <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
                   Week {currentWeekNum} Volume: <strong className="text-orange-400">{currentWeekKm} km</strong>
-                  <button onClick={handleExportWeek} className="ml-2 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded border border-slate-700 font-semibold inline-flex items-center gap-1">
-                    <Download className="w-2.5 h-2.5 text-orange-400" /> Export Week
-                  </button>
                 </span>
                 <span>{totalPlanCompletedKm} / {totalPlanKm} km Total Progress</span>
               </div>
