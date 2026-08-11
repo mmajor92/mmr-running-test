@@ -119,15 +119,17 @@ function generateICSContent(workouts: Workout[], planName: string): string {
 }
 
 function triggerICSDownload(icsContent: string, filename: string) {
-  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+  const encodedData = encodeURIComponent(icsContent);
+  const dataUrl = `data:text/calendar;charset=utf-8,${encodedData}`;
+
   const link = document.createElement('a');
-  link.href = url;
+  link.href = dataUrl;
   link.setAttribute('download', filename.endsWith('.ics') ? filename : `${filename}.ics`);
+  link.setAttribute('target', '_blank');
+  
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 }
 
 function parsePastedAIPlan(rawText: string, startDateStr: string, planName: string): Workout[] {
