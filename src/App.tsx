@@ -83,7 +83,7 @@ const INITIAL_PLAN: TrainingPlan = {
   workouts: DEFAULT_WORKOUTS,
 };
 
-// --- SILENT & FREE ICS CALENDAR GENERATOR (NO DEFAULT REMINDERS/ALARMS) ---
+// --- SILENT & FREE ICS CALENDAR GENERATOR (NO NOTIFICATIONS / ALARMS) ---
 function generateICSContent(workouts: Workout[], planName: string): string {
   const sanitize = (text: string) => text.replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
   
@@ -112,8 +112,14 @@ function generateICSContent(workouts: Workout[], planName: string): string {
       `DESCRIPTION:${sanitize(description)}`,
       'STATUS:CONFIRMED',
       'TRANSP:TRANSPARENT',           // Keeps calendar time free
-      'X-APPLE-DEFAULT-ALARM:FALSE', // Disables Apple Calendar 5pm day-before alarm
+      'X-APPLE-DEFAULT-ALARM:FALSE', // Disables default Apple alert
       'X-MICROSOFT-CDO-BUSYSTATUS:FREE',
+      // Explicitly overrides alarms with a silent NONE action
+      'BEGIN:VALARM',
+      'ACTION:NONE',
+      'TRIGGER;VALUE=DATE-TIME:19700101T000000Z',
+      'DESCRIPTION:No Reminder',
+      'END:VALARM',
       'END:VEVENT'
     );
   });
