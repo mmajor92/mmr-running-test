@@ -467,9 +467,10 @@ export default function App() {
   };
 
   const handleExportSingleRun = (e: React.MouseEvent, workout: Workout) => {
-    e.stopPropagation();
-    openGoogleCalendar(workout, activePlan.name);
-  };
+  e.stopPropagation();
+  const content = generateICSContent([workout], activePlan.name);
+  triggerICSDownload(content, `${workout.workoutType.replace(/[^a-z0-9]/gi, '_')}.ics`);
+};
 
   const handleExportWeek = () => {
     const content = generateICSContent(currentWeekWorkouts, `${activePlan.name} - Week ${currentWeekNum}`);
