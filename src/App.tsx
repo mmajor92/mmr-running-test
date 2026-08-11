@@ -477,15 +477,20 @@ export default function Index() {
       >
         <div className="flex justify-between items-start gap-2">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap flex-wrap">
+            
+            {/* TODAY BADGE POSITIONED DIRECTLY ABOVE DATE */}
+            {isToday && (
+              <div className="mb-1">
+                <span className="inline-block text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full shadow-sm">
+                  Today
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap">
               <span className="shrink-0">{workout.dayName}, {workout.displayDate}</span>
               <span className="shrink-0">•</span>
               <span className="shrink-0">Week {workout.weekNumber}</span>
-              {isToday && (
-                <span className="text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full ml-0.5 shrink-0">
-                  Today
-                </span>
-              )}
             </div>
             <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">{workout.workoutType}</div>
           </div>
