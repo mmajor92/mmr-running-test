@@ -118,18 +118,31 @@ function generateICSContent(workouts: Workout[], planName: string): string {
   return ics.join('\r\n');
 }
 
+function openGoogleCalendar(workout: Workout, planName: string) {
+  const dateFormatted = workout.dateStr.replace(/-/g, '');
+  const title = encodeURIComponent(`${workout.workoutType} (${workout.totalKm})`);
+  const details = encodeURIComponent(
+    `Plan: ${planName}\nBreakdown: ${workout.breakdown}\nCoach Advice: ${workout.advice}${workout.nrc ? `\nNRC: ${workout.nrc}` : ''}`
+  );
+  
+  const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateFormatted}/${dateFormatted}&details=${details}`;
+  window.open(googleCalUrl, '_blank');
+}
+
 function triggerICSDownload(icsContent: string, filename: string) {
-  const encodedData = encodeURIComponent(icsContent);
-  const dataUrl = `data:text/calendar;charset=utf-8,${encodedData}`;
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');
-  link.href = dataUrl;
+  link.href = url;
   link.setAttribute('download', filename.endsWith('.ics') ? filename : `${filename}.ics`);
   link.setAttribute('target', '_blank');
   
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
 }
 
 function parsePastedAIPlan(rawText: string, startDateStr: string, planName: string): Workout[] {
@@ -270,7 +283,6 @@ export default function App() {
     return activePlan.workouts.filter((w) => w.dateStr >= todayStr);
   }, [activePlan, todayStr]);
 
-  // SAFE PREVIOUS WORKOUTS ARRAY FIX (NO React state mutation)
   const previousWorkouts = useMemo(() => {
     return activePlan.workouts.filter((w) => w.dateStr < todayStr).slice().reverse();
   }, [activePlan, todayStr]);
@@ -427,8 +439,7 @@ export default function App() {
 
   const handleExportSingleRun = (e: React.MouseEvent, workout: Workout) => {
     e.stopPropagation();
-    const content = generateICSContent([workout], activePlan.name);
-    triggerICSDownload(content, `${workout.workoutType.replace(/[^a-z0-9]/gi, '_')}.ics`);
+    openGoogleCalendar(workout, activePlan.name);
   };
 
   const handleExportWeek = () => {
@@ -503,7 +514,7 @@ export default function App() {
             <button
               onClick={(e) => handleExportSingleRun(e, workout)}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
-              title="Add single run to calendar (.ics)"
+              title="Add run to Google Calendar"
             >
               <CalendarPlus className="w-4 h-4 text-orange-400" />
             </button>
