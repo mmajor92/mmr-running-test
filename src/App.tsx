@@ -83,7 +83,6 @@ const INITIAL_PLAN: TrainingPlan = {
   workouts: DEFAULT_WORKOUTS,
 };
 
-// --- SILENT & FREE ICS CALENDAR GENERATOR ---
 function generateICSContent(workouts: Workout[], planName: string): string {
   const sanitize = (text: string) => text.replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
   
@@ -110,7 +109,7 @@ function generateICSContent(workouts: Workout[], planName: string): string {
       `SUMMARY:${sanitize(summary)}`,
       `DESCRIPTION:${sanitize(description)}`,
       'STATUS:CONFIRMED',
-      'TRANSP:TRANSPARENT', // Marks time as FREE on calendar
+      'TRANSP:TRANSPARENT',
       'END:VEVENT'
     );
   });
@@ -131,7 +130,6 @@ function triggerICSDownload(icsContent: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-// --- AI PLAN TEXT PARSER ---
 function parsePastedAIPlan(rawText: string, startDateStr: string, planName: string): Workout[] {
   const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
   const workouts: Workout[] = [];
@@ -448,11 +446,10 @@ export default function Index() {
     setShowExportMenu(false);
   };
 
-  // FULL 2PX BORDER & SUBTLE TINT CATEGORY STYLES
   const getCategoryStyles = (category: Workout['category']) => {
     switch (category) {
       case 'intervals': 
-        return 'border-purple-500/80 bg-purple-950/20 text-purple-400'; // High-contrast Purple for Speed/Intervals
+        return 'border-purple-500/80 bg-purple-950/20 text-purple-400';
       case 'progression': 
         return 'border-emerald-500/80 bg-emerald-950/20 text-emerald-400';
       case 'shakeout': 
@@ -479,18 +476,18 @@ export default function Index() {
         }`}
       >
         <div className="flex justify-between items-start gap-2">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-              <span>{workout.dayName}, {workout.displayDate}</span>
-              <span>•</span>
-              <span>Week {workout.weekNumber}</span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap flex-wrap">
+              <span className="shrink-0">{workout.dayName}, {workout.displayDate}</span>
+              <span className="shrink-0">•</span>
+              <span className="shrink-0">Week {workout.weekNumber}</span>
               {isToday && (
-                <span className="text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full ml-1">
+                <span className="text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full ml-0.5 shrink-0">
                   Today
                 </span>
               )}
             </div>
-            <div className="font-extrabold text-white text-base sm:text-lg mt-0.5">{workout.workoutType}</div>
+            <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">{workout.workoutType}</div>
           </div>
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <span className="font-black text-orange-400 text-sm sm:text-base mr-1">{workout.totalKm}</span>
@@ -518,13 +515,11 @@ export default function Index() {
           </div>
         </div>
 
-        {/* Permanently Visible Breakdown */}
         <div className="mt-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-xs sm:text-sm text-slate-300">
           <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Breakdown</span>
           {workout.breakdown}
         </div>
 
-        {/* Optional Expanded Coach Advice & NRC Info */}
         {isExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-150">
             <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/50 space-y-2">
@@ -565,8 +560,6 @@ export default function Index() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                
-                {/* EXPORT ICAL DROPDOWN MENU */}
                 <div className="relative">
                   <button
                     onClick={() => setShowExportMenu(!showExportMenu)}
@@ -651,7 +644,6 @@ export default function Index() {
           </div>
         </header>
 
-        {/* Plans Manager Drawer */}
         {showArchiveManager && (
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -707,7 +699,6 @@ export default function Index() {
           </div>
         )}
 
-        {/* In-App "Add Plan" Form Modal */}
         {showNewPlanModal && (
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
@@ -885,7 +876,6 @@ export default function Index() {
           </button>
         </div>
 
-        {/* TAB 1: UPCOMING RUNS WITH WEEK HEADERS */}
         {activeTab === 'upcoming' && (
           <div className="space-y-6">
             {Object.keys(upcomingByWeek).length > 0 ? (
@@ -923,7 +913,6 @@ export default function Index() {
           </div>
         )}
 
-        {/* TAB 2: WHOLE PLAN WITH WEEK HEADERS */}
         {activeTab === 'whole' && (
           <div className="space-y-6">
             {Object.keys(workoutsByWeek)
@@ -955,7 +944,6 @@ export default function Index() {
           </div>
         )}
 
-        {/* TAB 3: PREVIOUS RUNS WITH WEEK HEADERS */}
         {activeTab === 'previous' && (
           <div className="space-y-6">
             {Object.keys(previousByWeek).length > 0 ? (
