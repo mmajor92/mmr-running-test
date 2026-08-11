@@ -95,8 +95,21 @@ function generateICSContent(workouts: Workout[], planName: string): string {
   ];
 
   workouts.forEach((w) => {
-    const dateFormatted = w.dateStr.replace(/-/g, '');
-    const uid = `run-${w.id}-${dateFormatted}@mmrrunninghub.com`;
+    const startDate = new Date(w.dateStr);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+
+    const formatCalDate = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}${month}${day}`;
+    };
+
+    const startFormatted = formatCalDate(startDate);
+    const endFormatted = formatCalDate(endDate);
+
+    const uid = `run-${w.id}-${startFormatted}@mmrrunninghub.com`;
     const summary = `${w.workoutType} (${w.totalKm})`;
     const description = `Breakdown: ${w.breakdown}\\nCoach Advice: ${w.advice}${w.nrc ? `\\nNRC Guided Run: ${w.nrc}` : ''}`;
 
@@ -104,8 +117,8 @@ function generateICSContent(workouts: Workout[], planName: string): string {
       'BEGIN:VEVENT',
       `UID:${uid}`,
       `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
-      `DTSTART;VALUE=DATE:${dateFormatted}`,
-      `DTEND;VALUE=DATE:${dateFormatted}`,
+      `DTSTART;VALUE=DATE:${startFormatted}`,
+      `DTEND;VALUE=DATE:${endFormatted}`,
       `SUMMARY:${sanitize(summary)}`,
       `DESCRIPTION:${sanitize(description)}`,
       'STATUS:CONFIRMED',
@@ -119,13 +132,29 @@ function generateICSContent(workouts: Workout[], planName: string): string {
 }
 
 function openGoogleCalendar(workout: Workout, planName: string) {
-  const dateFormatted = workout.dateStr.replace(/-/g, '');
+  // Parse start date
+  const startDate = new Date(workout.dateStr);
+  
+  // Calculate next day for inclusive all-day event
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 1);
+
+  const formatCalDate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+  };
+
+  const startFormatted = formatCalDate(startDate);
+  const endFormatted = formatCalDate(endDate);
+
   const title = encodeURIComponent(`${workout.workoutType} (${workout.totalKm})`);
   const details = encodeURIComponent(
     `Plan: ${planName}\nBreakdown: ${workout.breakdown}\nCoach Advice: ${workout.advice}${workout.nrc ? `\nNRC: ${workout.nrc}` : ''}`
   );
   
-  const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateFormatted}/${dateFormatted}&details=${details}`;
+  const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startFormatted}/${endFormatted}&details=${details}`;
   window.open(googleCalUrl, '_blank');
 }
 
