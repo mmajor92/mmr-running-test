@@ -190,7 +190,7 @@ function parsePastedAIPlan(rawText: string, startDateStr: string, planName: stri
   return workouts.length > 0 ? workouts : DEFAULT_WORKOUTS;
 }
 
-export default function Index() {
+export default function App() {
   const [plans, setPlans] = useState<TrainingPlan[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('hm_training_plans');
@@ -268,9 +268,10 @@ export default function Index() {
     return activePlan.workouts.filter((w) => w.dateStr >= todayStr);
   }, [activePlan, todayStr]);
 
-const previousWorkouts = useMemo(() => {
-  return activePlan.workouts.filter((w) => w.dateStr < todayStr).slice().reverse();
-}, [activePlan, todayStr]);
+  // SAFE PREVIOUS WORKOUTS ARRAY FIX (NO React state mutation)
+  const previousWorkouts = useMemo(() => {
+    return activePlan.workouts.filter((w) => w.dateStr < todayStr).slice().reverse();
+  }, [activePlan, todayStr]);
 
   const currentWeekNum = useMemo(() => {
     const nextWorkout = activePlan.workouts.find((w) => w.dateStr >= todayStr);
@@ -283,20 +284,20 @@ const previousWorkouts = useMemo(() => {
 
   const currentWeekKm = useMemo(() => {
     return currentWeekWorkouts
-      .reduce((sum, w) => sum + w.numericKm, 0)
+      .reduce((sum, w) => sum + (w.numericKm || 0), 0)
       .toFixed(1);
   }, [currentWeekWorkouts]);
 
   const totalPlanCompletedKm = useMemo(() => {
     return activePlan.workouts
       .filter((w) => w.dateStr < todayStr)
-      .reduce((sum, w) => sum + w.numericKm, 0)
+      .reduce((sum, w) => sum + (w.numericKm || 0), 0)
       .toFixed(1);
   }, [activePlan, todayStr]);
 
   const totalPlanKm = useMemo(() => {
     return activePlan.workouts
-      .reduce((sum, w) => sum + w.numericKm, 0)
+      .reduce((sum, w) => sum + (w.numericKm || 0), 0)
       .toFixed(1);
   }, [activePlan]);
 
@@ -330,7 +331,7 @@ const previousWorkouts = useMemo(() => {
       }
       weeksMap[w.weekNumber].push(w);
     });
-    return previousWorkouts;
+    return weeksMap;
   }, [previousWorkouts]);
 
   const paceCalculations = useMemo(() => {
@@ -893,7 +894,7 @@ const previousWorkouts = useMemo(() => {
                 .map((weekNum) => {
                   const weekWorkouts = upcomingByWeek[weekNum];
                   const weekKmTotal = weekWorkouts
-                    .reduce((sum, w) => sum + w.numericKm, 0)
+                    .reduce((sum, w) => sum + (w.numericKm || 0), 0)
                     .toFixed(1);
                   return (
                     <div key={weekNum} className="space-y-3">
@@ -929,7 +930,7 @@ const previousWorkouts = useMemo(() => {
               .map((weekNum) => {
                 const weekWorkouts = workoutsByWeek[weekNum];
                 const weekKmTotal = weekWorkouts
-                  .reduce((sum, w) => sum + w.numericKm, 0)
+                  .reduce((sum, w) => sum + (w.numericKm || 0), 0)
                   .toFixed(1);
                 return (
                   <div key={weekNum} className="space-y-3">
@@ -954,14 +955,14 @@ const previousWorkouts = useMemo(() => {
 
         {activeTab === 'previous' && (
           <div className="space-y-6">
-            {Object.keys(previousByWeek).length > 0 ? (
+            {previousWorkouts && previousWorkouts.length > 0 ? (
               Object.keys(previousByWeek)
                 .map(Number)
                 .sort((a, b) => b - a)
                 .map((weekNum) => {
-                  const weekWorkouts = previousByWeek[weekNum];
+                  const weekWorkouts = previousByWeek[weekNum] || [];
                   const weekKmTotal = weekWorkouts
-                    .reduce((sum, w) => sum + w.numericKm, 0)
+                    .reduce((sum, w) => sum + (w.numericKm || 0), 0)
                     .toFixed(1);
                   return (
                     <div key={weekNum} className="space-y-3">
