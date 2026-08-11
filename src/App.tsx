@@ -92,7 +92,6 @@ function generateICSContent(workouts: Workout[], planName: string): string {
     'VERSION:2.0',
     'PRODID:-//MMR Running Hub//Training Plan Calendar//EN',
     'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
     `X-WR-CALNAME:${sanitize(planName)}`
   ];
 
@@ -111,8 +110,7 @@ function generateICSContent(workouts: Workout[], planName: string): string {
       `SUMMARY:${sanitize(summary)}`,
       `DESCRIPTION:${sanitize(description)}`,
       'STATUS:CONFIRMED',
-      'TRANSP:TRANSPARENT',               // Marks standard iCal status as FREE
-      'X-MICROSOFT-CDO-BUSYSTATUS:FREE', // Forces Outlook/Google Calendar status as FREE
+      'TRANSP:TRANSPARENT', // Marks time as FREE on calendar
       'END:VEVENT'
     );
   });
