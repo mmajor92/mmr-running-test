@@ -268,9 +268,9 @@ export default function Index() {
     return activePlan.workouts.filter((w) => w.dateStr >= todayStr);
   }, [activePlan, todayStr]);
 
-  const previousWorkouts = useMemo(() => {
-    return activePlan.workouts.filter((w) => w.dateStr < todayStr).reverse();
-  }, [activePlan, todayStr]);
+const previousWorkouts = useMemo(() => {
+  return activePlan.workouts.filter((w) => w.dateStr < todayStr).slice().reverse();
+}, [activePlan, todayStr]);
 
   const currentWeekNum = useMemo(() => {
     const nextWorkout = activePlan.workouts.find((w) => w.dateStr >= todayStr);
