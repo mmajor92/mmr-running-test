@@ -1,16 +1,23 @@
 {
   "id": "/",
-  "short_name": "MMRunner",
-  "name": "MMRunning Hub",
+  "short_name": "MMRunning",
+  "name": "MMR Running Hub",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#FF8C00",
   "icons": [
     {
-      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23FF8C00'/><path fill='white' d='M272 96a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm113.8 221.7l-48-96c-8.8-17.7-26.6-29.7-46.7-31.5l-63.1-5.7c-21.8-2-42.6 8.3-53 27.6l-32 64c-8.9 17.7-1.7 39.4 16 48.3s39.4 1.7 48.3-16l22.2-44.5 25 2.3-33.1 112.5c-6.8 23.2 2.3 48.2 22.3 61.1l70.7 45.7c16.5 10.7 38.3 5.9 49-10.6s5.9-38.3-10.6-49l-54.7-35.4 23.9-81.2 38.8 38.8c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3zM151.2 212.5l36.5-73.1c-10.4 4.8-19.6 12-26.8 21.2l-48 61.7c-12.1 15.5-9.6 37.7 5.9 49.8s37.7 9.6 49.8-5.9l19.8-25.5-23.7-21.3z'/></svg>",
+      "src": "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f3c3.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2870/2870639.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
