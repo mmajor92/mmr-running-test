@@ -83,7 +83,7 @@ const INITIAL_PLAN: TrainingPlan = {
   workouts: DEFAULT_WORKOUTS,
 };
 
-// --- SILENT & FREE ICS CALENDAR GENERATOR ---
+// --- SILENT & FREE ICS CALENDAR GENERATOR (NO DEFAULT REMINDERS/ALARMS) ---
 function generateICSContent(workouts: Workout[], planName: string): string {
   const sanitize = (text: string) => text.replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\n/g, '\\n');
   
@@ -92,6 +92,7 @@ function generateICSContent(workouts: Workout[], planName: string): string {
     'VERSION:2.0',
     'PRODID:-//MMR Running Hub//Training Plan Calendar//EN',
     'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
     `X-WR-CALNAME:${sanitize(planName)}`
   ];
 
@@ -110,7 +111,9 @@ function generateICSContent(workouts: Workout[], planName: string): string {
       `SUMMARY:${sanitize(summary)}`,
       `DESCRIPTION:${sanitize(description)}`,
       'STATUS:CONFIRMED',
-      'TRANSP:TRANSPARENT', // Marks time as FREE on calendar
+      'TRANSP:TRANSPARENT',           // Keeps calendar time free
+      'X-APPLE-DEFAULT-ALARM:FALSE', // Disables Apple Calendar 5pm day-before alarm
+      'X-MICROSOFT-CDO-BUSYSTATUS:FREE',
       'END:VEVENT'
     );
   });
@@ -563,7 +566,7 @@ export default function Index() {
               </div>
               <div className="flex items-center gap-2">
                 
-                {/* NEW EXPORT ICAL DROPDOWN MENU */}
+                {/* EXPORT ICAL DROPDOWN MENU */}
                 <div className="relative">
                   <button
                     onClick={() => setShowExportMenu(!showExportMenu)}
