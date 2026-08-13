@@ -651,15 +651,15 @@ export default function App() {
           <div className="relative z-10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                {/* MMR RUNNING HUB BADGE: WHITE TEXT WITH THEME BG */}
+                {/* MMR RUNNING HUB BADGE: FADED THEME TINT BG + WHITE TEXT */}
                 <div 
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-white border"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border text-white"
                   style={{ 
-                    backgroundColor: themeColor, 
-                    borderColor: themeColor 
+                    backgroundColor: `${themeColor}26`, 
+                    borderColor: `${themeColor}4d`,
                   }}
                 >
-                  <Flame className="w-3.5 h-3.5 text-white" />
+                  <Flame className="w-3.5 h-3.5" style={{ color: themeColor }} />
                   <span>MMR Running Hub</span>
                 </div>
 
@@ -759,15 +759,15 @@ export default function App() {
                 {activePlan.name}
               </h1>
               {daysUntilRace > 0 && (
-                /* COUNTDOWN BADGE: WHITE TEXT WITH THEME BG */
+                /* COUNTDOWN BADGE: FADED THEME TINT BG + WHITE TEXT */
                 <div 
                   className="flex items-center gap-1.5 text-xs font-bold text-white border px-3 py-1 rounded-full"
                   style={{ 
-                    backgroundColor: themeColor, 
-                    borderColor: themeColor 
+                    backgroundColor: `${themeColor}26`, 
+                    borderColor: `${themeColor}4d`,
                   }}
                 >
-                  <Clock className="w-3.5 h-3.5 text-white" />
+                  <Clock className="w-3.5 h-3.5" style={{ color: themeColor }} />
                   <span>{daysUntilRace} Days To Race Day</span>
                 </div>
               )}
@@ -1123,12 +1123,12 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          {/* WEEK NUMBER BADGE: WHITE TEXT WITH THEME BG */}
+                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                           <span 
                             className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
                             style={{ 
-                              backgroundColor: themeColor, 
-                              borderColor: themeColor 
+                              backgroundColor: `${themeColor}26`, 
+                              borderColor: `${themeColor}4d`,
                             }}
                           >
                             Week {weekNum}
@@ -1166,12 +1166,12 @@ export default function App() {
                   <div key={weekNum} className="space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                       <div className="flex items-center gap-2">
-                        {/* WEEK NUMBER BADGE: WHITE TEXT WITH THEME BG */}
+                        {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                         <span 
                           className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
                           style={{ 
-                            backgroundColor: themeColor, 
-                            borderColor: themeColor 
+                            backgroundColor: `${themeColor}26`, 
+                            borderColor: `${themeColor}4d`,
                           }}
                         >
                           Week {weekNum}
@@ -1205,12 +1205,12 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          {/* WEEK NUMBER BADGE: WHITE TEXT WITH THEME BG */}
+                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                           <span 
                             className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
                             style={{ 
-                              backgroundColor: themeColor, 
-                              borderColor: themeColor 
+                              backgroundColor: `${themeColor}26`, 
+                              borderColor: `${themeColor}4d`,
                             }}
                           >
                             Week {weekNum}
