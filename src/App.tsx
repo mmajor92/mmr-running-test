@@ -1125,7 +1125,7 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                           <span 
-                            className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black capitlize tracking-wider text-white px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
@@ -1168,7 +1168,7 @@ export default function App() {
                       <div className="flex items-center gap-2">
                         {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                         <span 
-                          className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
+                          className="text-xs font-black capitlize tracking-wider text-white px-2.5 py-1 rounded-md border"
                           style={{ 
                             backgroundColor: `${themeColor}26`, 
                             borderColor: `${themeColor}4d`,
@@ -1207,7 +1207,7 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
                           <span 
-                            className="text-xs font-black uppercase tracking-wider text-white px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black capitalize tracking-wider text-white px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
