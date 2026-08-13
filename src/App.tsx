@@ -44,9 +44,9 @@ export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f97316', name: 'Energy Orange' }, // 1. Orange
   { hex: '#f59e0b', name: 'Solar Amber' },   // 2. Amber
   { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red
-  { hex: '#3b82f6', name: 'Hyper Blue' },    // 4. Option B Blue
-  { hex: '#16a34a', name: 'Kelly Green' },    // 5. Option B Green
-  { hex: '#c026d3', name: 'Neon Orchid' },   // 6. Option B Purple
+  { hex: '#00a6ff', name: 'Sky Blue' },      // 4. Sky Blue
+  { hex: '#ebcae9', name: 'Soft Purple' },   // 5. Light Violet/Purple
+  { hex: '#fff645', name: 'Bright Yellow' }, // 6. Bright Yellow
 ];
 
 const DEFAULT_WORKOUTS: Workout[] = [
