@@ -214,12 +214,13 @@ function parsePastedAIPlan(rawText: string, startDateStr: string, planName: stri
     const dayName = sessionDate.toLocaleDateString('en-US', { weekday: 'short' });
     const displayDate = sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    let category: Workout['category'] = 'progression';
+  let category: Workout['category'] = 'progression';
     const lower = line.toLowerCase();
-    if (lower.includes('interval') || lower.includes('speed') || lower.includes('tempo') || lower.includes('vo2')) category = 'intervals';
-    else if (lower.includes('long') || lower.includes('steady')) category = 'longrun';
-    else if (lower.includes('shakeout') || lower.includes('easy') || lower.includes('rest')) category = 'shakeout';
+    if (lower.includes('interval') || lower.includes('speed') || lower.includes('tempo') || lower.includes('vo2') || lower.includes('threshold')) category = 'intervals';
     else if (lower.includes('race') || lower.includes('pb') || lower.includes('marathon')) category = 'raceday';
+    else if (lower.includes('long') || lower.includes('steady')) category = 'longrun';
+    else if (lower.includes('shakeout') || lower.includes('recovery') || lower.includes('rest')) category = 'shakeout';
+    else if (lower.includes('easy') || lower.includes('progression') || lower.includes('aerobic')) category = 'progression';
 
     const cleanTitle = line.replace(/^[\s*\-#\d.]+/, '').trim();
 
@@ -339,6 +340,10 @@ export default function App() {
     return activePlan.workouts.filter((w) => w.dateStr < todayStr).slice().reverse();
   }, [activePlan, todayStr]);
 
+  const wholeWorkouts = useMemo(() => {
+    return activePlan.workouts;
+  }, [activePlan]);
+
   const currentWeekNum = useMemo(() => {
     const nextWorkout = activePlan.workouts.find((w) => w.dateStr >= todayStr);
     return nextWorkout ? nextWorkout.weekNumber : 8;
@@ -369,14 +374,14 @@ export default function App() {
 
   const workoutsByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
-    activePlan.workouts.forEach((w) => {
+    wholeWorkouts.forEach((w) => {
       if (!weeksMap[w.weekNumber]) {
         weeksMap[w.weekNumber] = [];
       }
       weeksMap[w.weekNumber].push(w);
     });
     return weeksMap;
-  }, [activePlan]);
+  }, [wholeWorkouts]);
 
   const upcomingByWeek = useMemo(() => {
     const weeksMap: Record<number, Workout[]> = {};
