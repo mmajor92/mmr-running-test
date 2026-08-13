@@ -263,8 +263,9 @@ export default function App() {
   const [newTargetTime, setNewTargetTime] = useState('< 2:00:00');
   const [pastedPlanText, setPastedPlanText] = useState('');
 
-  const [paceMin, setPaceMin] = useState(5);
-  const [paceSec, setPaceSec] = useState(40);
+  // Stored as strings to permit backspace clearing without forcing a leading '0'
+  const [paceMinStr, setPaceMinStr] = useState('5');
+  const [paceSecStr, setPaceSecStr] = useState('40');
 
   const todayStr = useMemo(() => {
     const d = new Date();
@@ -374,8 +375,30 @@ export default function App() {
     return weeksMap;
   }, [previousWorkouts]);
 
+  // Stepper Handlers for Minutes & Seconds
+  const adjustMin = (delta: number) => {
+    const current = parseInt(paceMinStr, 10) || 0;
+    const val = Math.max(1, Math.min(20, current + delta));
+    setPaceMinStr(String(val));
+  };
+
+  const adjustSec = (delta: number) => {
+    const current = parseInt(paceSecStr, 10) || 0;
+    let newSec = current + delta;
+    if (newSec > 59) {
+      newSec = 0;
+      adjustMin(1);
+    } else if (newSec < 0) {
+      newSec = 59;
+      adjustMin(-1);
+    }
+    setPaceSecStr(String(newSec));
+  };
+
   const paceCalculations = useMemo(() => {
-    const totalPaceSec = paceMin * 60 + paceSec;
+    const pMin = parseInt(paceMinStr, 10) || 0;
+    const pSec = parseInt(paceSecStr, 10) || 0;
+    const totalPaceSec = pMin * 60 + pSec;
     const formatTime = (seconds: number) => {
       const h = Math.floor(seconds / 3600);
       const m = Math.floor((seconds % 3600) / 60);
@@ -390,7 +413,7 @@ export default function App() {
       sixteenK: formatTime(totalPaceSec * 16),
       halfMarathon: formatTime(totalPaceSec * 21.0975),
     };
-  }, [paceMin, paceSec]);
+  }, [paceMinStr, paceSecStr]);
 
   const toggleExpand = (id: string) => {
     setExpandedWorkoutIds((prev) => ({
@@ -853,41 +876,103 @@ export default function App() {
           </div>
         )}
 
+        {/* PACE CALCULATOR COMPONENT */}
         {showPaceCalc && (
           <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-            <div className="flex justify-between items-center flex-wrap gap-2">
+            
+            {/* ROW 1: HEADER TITLE */}
+            <div className="border-b border-slate-800/80 pb-2">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Calculator className="w-4 h-4 text-orange-400" /> Pace Calculator
               </h3>
-              <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-                <span className="text-xs font-semibold text-slate-300">Pace:</span>
-                <div className="flex items-center gap-1">
-                  <input type="number" min="3" max="10" value={paceMin} onChange={(e) => setPaceMin(Number(e.target.value))} className="w-10 bg-slate-800 text-center font-bold text-orange-400 rounded py-0.5 text-xs border border-slate-700" />
-                  <span className="text-xs text-slate-400 font-bold">:</span>
-                  <input type="number" min="0" max="59" value={paceSec} onChange={(e) => setPaceSec(Number(e.target.value))} className="w-10 bg-slate-800 text-center font-bold text-orange-400 rounded py-0.5 text-xs border border-slate-700" />
-                  <span className="text-xs text-slate-400 font-medium ml-0.5">/km</span>
+            </div>
+
+            {/* ROW 2: ACTUAL PACE CALCULATOR INPUTS WITH STEPPERS */}
+            <div className="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 w-fit">
+              <span className="text-xs font-semibold text-slate-300">Target Pace:</span>
+              <div className="flex items-center gap-2">
+                
+                {/* Minute Input + Arrow Buttons */}
+                <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                  <input 
+                    type="text" 
+                    value={paceMinStr} 
+                    onChange={(e) => setPaceMinStr(e.target.value.replace(/[^0-9]/g, ''))} 
+                    className="w-10 bg-transparent text-center font-bold text-orange-400 py-1 text-sm focus:outline-none" 
+                  />
+                  <div className="flex flex-col border-l border-slate-700/80">
+                    <button 
+                      type="button" 
+                      onClick={() => adjustMin(1)} 
+                      className="px-1 hover:bg-slate-700/80 text-slate-400 hover:text-white text-[9px] transition-colors"
+                    >
+                      <ChevronUp className="w-3 h-3" />
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => adjustMin(-1)} 
+                      className="px-1 hover:bg-slate-700/80 text-slate-400 hover:text-white text-[9px] transition-colors border-t border-slate-700/60"
+                    >
+                      <ChevronDown className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
+
+                <span className="text-xs text-slate-400 font-bold">:</span>
+
+                {/* Second Input + Arrow Buttons */}
+                <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                  <input 
+                    type="text" 
+                    value={paceSecStr} 
+                    onChange={(e) => setPaceSecStr(e.target.value.replace(/[^0-9]/g, ''))} 
+                    className="w-10 bg-transparent text-center font-bold text-orange-400 py-1 text-sm focus:outline-none" 
+                  />
+                  <div className="flex flex-col border-l border-slate-700/80">
+                    <button 
+                      type="button" 
+                      onClick={() => adjustSec(1)} 
+                      className="px-1 hover:bg-slate-700/80 text-slate-400 hover:text-white text-[9px] transition-colors"
+                    >
+                      <ChevronUp className="w-3 h-3" />
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => adjustSec(-1)} 
+                      className="px-1 hover:bg-slate-700/80 text-slate-400 hover:text-white text-[9px] transition-colors border-t border-slate-700/60"
+                    >
+                      <ChevronDown className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                <span className="text-xs text-slate-400 font-medium ml-0.5">/km</span>
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+
+            {/* ROW 3: OPTION 2 - UNIFIED SEGMENTED STRIP */}
+            <div className="grid grid-cols-4 bg-slate-950 rounded-xl border border-slate-800 divide-x divide-slate-800 text-center py-2.5 overflow-hidden">
+              <div className="px-1">
                 <div className="text-[10px] uppercase font-bold text-slate-500">5k</div>
-                <div className="text-base font-black text-white mt-0.5">{paceCalculations.fiveK}</div>
+                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.fiveK}</div>
               </div>
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+
+              <div className="px-1">
                 <div className="text-[10px] uppercase font-bold text-slate-500">10k</div>
-                <div className="text-base font-black text-white mt-0.5">{paceCalculations.tenK}</div>
+                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.tenK}</div>
               </div>
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+
+              <div className="px-1">
                 <div className="text-[10px] uppercase font-bold text-slate-500">16k</div>
-                <div className="text-base font-black text-white mt-0.5">{paceCalculations.sixteenK}</div>
+                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.sixteenK}</div>
               </div>
-              <div className="bg-slate-950/80 p-3 rounded-xl border border-orange-500/30 bg-orange-500/5">
+
+              <div className="px-1 bg-orange-500/10">
                 <div className="text-[10px] uppercase font-bold text-orange-400">21.1k</div>
-                <div className="text-base font-black text-orange-400 mt-0.5">{paceCalculations.halfMarathon}</div>
+                <div className="text-xs sm:text-sm font-black text-orange-400 mt-0.5">{paceCalculations.halfMarathon}</div>
               </div>
             </div>
+
           </div>
         )}
 
