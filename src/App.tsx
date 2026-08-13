@@ -41,12 +41,12 @@ export interface ThemeColor {
 }
 
 export const THEME_COLORS: ThemeColor[] = [
-  { hex: '#f97316', name: 'Energy Orange' }, // 1. Orange (Keeper)
-  { hex: '#f59e0b', name: 'Solar Amber' },   // 2. Amber (Keeper)
-  { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red/Rose (Keeper)
-  { hex: '#0284c7', name: 'Bright Sky' },    // 4. New Blue
-  { hex: '#84cc16', name: 'Volt Lime' },     // 5. New Green
-  { hex: '#00bd29', name: 'Green' },   // 6. New Pink/Purple
+  { hex: '#f97316', name: 'Energy Orange' }, // 1. Orange
+  { hex: '#f59e0b', name: 'Solar Amber' },   // 2. Amber
+  { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red
+  { hex: '#3b82f6', name: 'Hyper Blue' },    // 4. Option B Blue
+  { hex: '#16a34a', name: 'Kelly Green' },    // 5. Option B Green
+  { hex: '#c026d3', name: 'Neon Orchid' },   // 6. Option B Purple
 ];
 
 const DEFAULT_WORKOUTS: Workout[] = [
