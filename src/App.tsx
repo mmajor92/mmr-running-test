@@ -45,8 +45,8 @@ export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f59e0b', name: 'Solar Amber' },   // 2. Amber
   { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red
   { hex: '#00a6ff', name: 'Sky Blue' },      // 4. Sky Blue
-  { hex: '#ebcae9', name: 'Soft Purple' },   // 5. Light Violet/Purple
-  { hex: '#fff645', name: 'Bright Yellow' }, // 6. Bright Yellow
+  { hex: '#10b981 ', name: 'Mint' },   // 5. Mint
+  { hex: '#FFD700', name: 'Gold' }, // 6. Gold
 ];
 
 const DEFAULT_WORKOUTS: Workout[] = [
