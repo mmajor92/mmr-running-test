@@ -46,7 +46,7 @@ export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red/Rose (Keeper)
   { hex: '#0284c7', name: 'Bright Sky' },    // 4. New Blue
   { hex: '#84cc16', name: 'Volt Lime' },     // 5. New Green
-  { hex: '#db2777', name: 'Hot Magenta' },   // 6. New Pink/Purple
+  { hex: '#00bd29', name: 'Green' },   // 6. New Pink/Purple
 ];
 
 const DEFAULT_WORKOUTS: Workout[] = [
