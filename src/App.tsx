@@ -42,9 +42,9 @@ export interface ThemeColor {
 
 export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f97316', name: 'Energy Orange' },
-  { hex: '#10b981', name: 'Electric Emerald' },
-  { hex: '#06b6d4', name: 'Cyber Cyan' },
-  { hex: '#a855f7', name: 'Neon Violet' },
+  { hex: '#00ff66', name: 'Hyper Emerald' },
+  { hex: '#00f0ff', name: 'Laser Cyan' },
+  { hex: '#d946ef', name: 'Electric Fuchsia' },
   { hex: '#f43f5e', name: 'Hot Rose' },
   { hex: '#f59e0b', name: 'Solar Amber' },
 ];
