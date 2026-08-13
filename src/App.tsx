@@ -42,9 +42,9 @@ export interface ThemeColor {
 
 export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f97316', name: 'Energy Orange' },
-  { hex: '#22c55e', name: 'Active Green' },
-  { hex: '#38bdf8', name: 'Sky Cerulean' },
-  { hex: '#a855f7', name: 'Vibrant Iris' },
+  { hex: '#00e676', name: 'Electric Mint' },
+  { hex: '#00d5ff', name: 'Aqua Volt' },
+  { hex: '#e066ff', name: 'Bright Violet' },
   { hex: '#f43f5e', name: 'Hot Rose' },
   { hex: '#f59e0b', name: 'Solar Amber' },
 ];
@@ -539,11 +539,11 @@ export default function App() {
   const getCategoryStyles = (category: Workout['category']) => {
     switch (category) {
       case 'intervals': 
-        return 'border-purple-500/80 bg-purple-950/20 text-purple-400';
+        return 'border-fuchsia-500/80 bg-fuchsia-950/20 text-fuchsia-400';
       case 'progression': 
         return 'border-emerald-500/80 bg-emerald-950/20 text-emerald-400';
       case 'shakeout': 
-        return 'border-sky-500/80 bg-sky-950/20 text-sky-400';
+        return 'border-cyan-500/80 bg-cyan-950/20 text-cyan-400';
       case 'longrun': 
         return 'border-rose-500/80 bg-rose-950/20 text-rose-400';
       case 'raceday': 
