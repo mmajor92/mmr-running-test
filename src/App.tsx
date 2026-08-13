@@ -35,6 +35,20 @@ interface TrainingPlan {
   workouts: Workout[];
 }
 
+export interface ThemeColor {
+  hex: string;
+  name: string;
+}
+
+export const THEME_COLORS: ThemeColor[] = [
+  { hex: '#f97316', name: 'Energy Orange' },
+  { hex: '#10b981', name: 'Electric Emerald' },
+  { hex: '#06b6d4', name: 'Cyber Cyan' },
+  { hex: '#a855f7', name: 'Neon Violet' },
+  { hex: '#f43f5e', name: 'Hot Rose' },
+  { hex: '#f59e0b', name: 'Solar Amber' },
+];
+
 const DEFAULT_WORKOUTS: Workout[] = [
   { id: '1', weekNumber: 1, dateStr: '2026-07-28', displayDate: 'Jul 28', dayName: 'Tue', workoutType: 'VO2 Max Intervals ⚡', category: 'intervals', breakdown: '1.5 km Warmup + 5x2 mins @ 5k Pace (90s recovery jog) + 1.5 km Cooldown', numericKm: 5.0, totalKm: '5.0 km', stravaTitle: 'HM Plan (Week 1/8): VO2 Max Intervals - 1.5 km Warmup + 5x2 mins @ 5k Pace + 1.5 km Cooldown = 5.0 km Total', advice: 'Focus on sustained power and smooth turnover 🏃‍♂️.', nrc: 'One Hard One Easy' },
   { id: '2', weekNumber: 1, dateStr: '2026-07-30', displayDate: 'Jul 30', dayName: 'Thu', workoutType: 'Easy Progression 🌿', category: 'progression', breakdown: '4 km Easy (@ 6:15-6:30/km) + 2 km @ Race Pace (@ 5:40-5:50/km)', numericKm: 6.0, totalKm: '6.0 km', stravaTitle: 'HM Plan (Week 1/8): Easy Progression - 4 km Easy + 2 km @ Race Pace = 6.0 km Total', advice: 'Zone 2 start smooth race pace pick-up over final 2 km 🎯.' },
@@ -248,6 +262,14 @@ export default function App() {
     return 'plan-1';
   });
 
+  const [themeColor, setThemeColor] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('hm_theme_color') || THEME_COLORS[0].hex;
+    }
+    return THEME_COLORS[0].hex;
+  });
+
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'whole' | 'previous'>('upcoming');
   const [expandedWorkoutIds, setExpandedWorkoutIds] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -293,6 +315,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('hm_active_plan_id', activePlanId);
   }, [activePlanId]);
+
+  useEffect(() => {
+    localStorage.setItem('hm_theme_color', themeColor);
+  }, [themeColor]);
 
   const activePlan = useMemo(() => {
     return plans.find((p) => p.id === activePlanId) || plans[0] || INITIAL_PLAN;
@@ -536,12 +562,16 @@ export default function App() {
         key={workout.id}
         onClick={() => toggleExpand(workout.id)}
         className={`p-4 sm:p-5 rounded-2xl border-2 ${getCategoryStyles(workout.category)} transition-all cursor-pointer ${
-          isToday ? 'ring-2 ring-orange-500 ring-offset-2 ring-offset-slate-950' : 'hover:brightness-110'
+          isToday ? 'ring-2 ring-offset-2 ring-offset-slate-950' : 'hover:brightness-110'
         }`}
+        style={isToday ? { '--tw-ring-color': themeColor } as React.CSSProperties : undefined}
       >
         {isToday && (
           <div className="mb-2">
-            <span className="inline-block text-[10px] font-black uppercase bg-orange-500 text-white px-2 py-0.5 rounded-full shadow-sm">
+            <span 
+              className="inline-block text-[10px] font-black uppercase text-white px-2 py-0.5 rounded-full shadow-sm"
+              style={{ backgroundColor: themeColor }}
+            >
               Today
             </span>
           </div>
@@ -558,17 +588,22 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            <span className="font-black text-orange-400 text-sm sm:text-base mr-1">{workout.totalKm}</span>
+            <span className="font-black text-sm sm:text-base mr-1" style={{ color: themeColor }}>{workout.totalKm}</span>
             <button
               onClick={(e) => handleExportSingleRun(e, workout)}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
               title="Add run to Google Calendar"
             >
-              <CalendarPlus className="w-4 h-4 text-orange-400" />
+              <CalendarPlus className="w-4 h-4" style={{ color: themeColor }} />
             </button>
             <button
               onClick={(e) => handleCopyStrava(e, workout.id, workout.stravaTitle)}
-              className="p-2 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 text-orange-400 transition-colors"
+              className="p-2 rounded-xl border transition-colors"
+              style={{ 
+                backgroundColor: `${themeColor}1a`, 
+                borderColor: `${themeColor}4d`,
+                color: themeColor 
+              }}
               title="Copy Strava Title"
             >
               {copiedId === workout.id ? (
@@ -592,7 +627,7 @@ export default function App() {
           <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2 animate-in fade-in duration-150">
             <div className="p-3 bg-slate-950/40 rounded-xl border border-slate-800/50 space-y-2">
               <p className="text-xs text-slate-300 italic">
-                <strong className="text-orange-400 not-italic">Coach Advice: </strong>
+                <strong className="not-italic" style={{ color: themeColor }}>Coach Advice: </strong>
                 {workout.advice}
               </p>
               {workout.nrc && (
@@ -612,15 +647,51 @@ export default function App() {
       <div className="max-w-4xl mx-auto space-y-6">
         <header className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 p-6 shadow-2xl">
           <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-            <Trophy className="w-48 h-48 text-orange-500" />
+            <Trophy className="w-48 h-48" style={{ color: themeColor }} />
           </div>
           <div className="relative z-10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                <div 
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border"
+                  style={{ 
+                    backgroundColor: `${themeColor}1a`, 
+                    borderColor: `${themeColor}33`,
+                    color: themeColor 
+                  }}
+                >
                   <Flame className="w-3.5 h-3.5" />
                   <span>MMR Running Hub</span>
                 </div>
+
+                {/* Horizontal Theme Color Selector Next To Badge */}
+                <div className="relative flex items-center">
+                  <button
+                    onClick={() => setShowThemePicker(!showThemePicker)}
+                    className="w-5 h-5 rounded-full border-2 border-slate-700 hover:scale-110 transition-transform focus:outline-none shadow-md shrink-0"
+                    style={{ backgroundColor: themeColor }}
+                    title="Change theme color"
+                  />
+                  {showThemePicker && (
+                    <div className="absolute left-7 top-1/2 -translate-y-1/2 flex items-center gap-1.5 p-1 bg-slate-900 border border-slate-800 rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-left-2 duration-150">
+                      {THEME_COLORS.map((theme) => (
+                        <button
+                          key={theme.hex}
+                          onClick={() => {
+                            setThemeColor(theme.hex);
+                            setShowThemePicker(false);
+                          }}
+                          className={`w-5 h-5 rounded-full transition-transform hover:scale-110 shrink-0 ${
+                            themeColor === theme.hex ? 'ring-2 ring-white ring-offset-1 ring-offset-slate-900 scale-105' : ''
+                          }`}
+                          style={{ backgroundColor: theme.hex }}
+                          title={theme.name}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                 {activePlan.status === 'archived' && (
                   <span className="bg-slate-800 text-slate-400 text-xs px-2.5 py-0.5 rounded-full border border-slate-700">
                     Archived Block
@@ -634,7 +705,7 @@ export default function App() {
                     onClick={() => setShowExportMenu(!showExportMenu)}
                     className="w-full justify-center inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors whitespace-nowrap"
                   >
-                    <Download className="w-3 h-3 text-orange-400 shrink-0" />
+                    <Download className="w-3 h-3 shrink-0" style={{ color: themeColor }} />
                     <span className="whitespace-nowrap">Export Cal</span>
                     <ChevronDown className="w-2.5 h-2.5 text-slate-400 shrink-0" />
                   </button>
@@ -646,21 +717,21 @@ export default function App() {
                         className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
                       >
                         <span>Export Whole Plan</span>
-                        <Calendar className="w-3.5 h-3.5 text-orange-400 shrink-0 ml-1" />
+                        <Calendar className="w-3.5 h-3.5 shrink-0 ml-1" style={{ color: themeColor }} />
                       </button>
                       <button
                         onClick={handleExportWeek}
                         className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
                       >
                         <span>Export Current Week</span>
-                        <BarChart3 className="w-3.5 h-3.5 text-orange-400 shrink-0 ml-1" />
+                        <BarChart3 className="w-3.5 h-3.5 shrink-0 ml-1" style={{ color: themeColor }} />
                       </button>
                       <button
                         onClick={handleExportUpcoming}
                         className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 rounded-lg transition-colors flex items-center justify-between"
                       >
                         <span>Export Upcoming Runs</span>
-                        <PlayCircle className="w-3.5 h-3.5 text-orange-400 shrink-0 ml-1" />
+                        <PlayCircle className="w-3.5 h-3.5 shrink-0 ml-1" style={{ color: themeColor }} />
                       </button>
                     </div>
                   )}
@@ -670,7 +741,7 @@ export default function App() {
                   onClick={() => setShowArchiveManager(!showArchiveManager)}
                   className="w-full justify-center inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors whitespace-nowrap"
                 >
-                  <FolderArchive className="w-3 h-3 text-orange-400 shrink-0" />
+                  <FolderArchive className="w-3 h-3 shrink-0" style={{ color: themeColor }} />
                   <span className="whitespace-nowrap">Plans</span>
                 </button>
 
@@ -678,7 +749,7 @@ export default function App() {
                   onClick={() => setShowPaceCalc(!showPaceCalc)}
                   className="w-full justify-center inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors whitespace-nowrap"
                 >
-                  <Calculator className="w-3 h-3 text-orange-400 shrink-0" />
+                  <Calculator className="w-3 h-3 shrink-0" style={{ color: themeColor }} />
                   <span className="whitespace-nowrap">Pace</span>
                 </button>
               </div>
@@ -689,7 +760,14 @@ export default function App() {
                 {activePlan.name}
               </h1>
               {daysUntilRace > 0 && (
-                <div className="flex items-center gap-1.5 text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/20 px-3 py-1 rounded-full">
+                <div 
+                  className="flex items-center gap-1.5 text-xs font-bold border px-3 py-1 rounded-full"
+                  style={{ 
+                    backgroundColor: `${themeColor}1a`, 
+                    borderColor: `${themeColor}33`,
+                    color: themeColor 
+                  }}
+                >
                   <Clock className="w-3.5 h-3.5" />
                   <span>{daysUntilRace} Days To Race Day</span>
                 </div>
@@ -699,15 +777,18 @@ export default function App() {
             <div className="space-y-1.5 pt-1">
               <div className="flex justify-between items-center text-xs text-slate-400">
                 <span className="flex items-center gap-1 text-slate-200">
-                  <BarChart3 className="w-3.5 h-3.5 text-orange-400" />
-                  Week {currentWeekNum} Volume: <strong className="text-orange-400">{currentWeekKm} km</strong>
+                  <BarChart3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
+                  Week {currentWeekNum} Volume: <strong style={{ color: themeColor }}>{currentWeekKm} km</strong>
                 </span>
                 <span>{totalPlanCompletedKm} / {totalPlanKm} km Total</span>
               </div>
               <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
                 <div
-                  className="h-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all duration-300"
-                  style={{ width: `${Math.min(100, (Number(totalPlanCompletedKm) / Number(totalPlanKm)) * 100)}%` }}
+                  className="h-full transition-all duration-300"
+                  style={{ 
+                    width: `${Math.min(100, (Number(totalPlanCompletedKm) / Number(totalPlanKm)) * 100)}%`,
+                    backgroundColor: themeColor
+                  }}
                 />
               </div>
             </div>
@@ -718,12 +799,13 @@ export default function App() {
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b border-slate-800 pb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Archive className="w-4 h-4 text-orange-400" />
+                <Archive className="w-4 h-4" style={{ color: themeColor }} />
                 Training Block Manager
               </h3>
               <button
                 onClick={() => setShowNewPlanModal(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-colors"
+                style={{ backgroundColor: themeColor }}
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Add Plan</span>
@@ -736,9 +818,13 @@ export default function App() {
                   onClick={() => setActivePlanId(p.id)}
                   className={`p-3 rounded-xl border flex justify-between items-center cursor-pointer transition-all ${
                     p.id === activePlan.id
-                      ? 'border-orange-500/80 bg-orange-500/10 text-white'
+                      ? 'text-white'
                       : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700'
                   }`}
+                  style={p.id === activePlan.id ? {
+                    borderColor: `${themeColor}cc`,
+                    backgroundColor: `${themeColor}1a`
+                  } : undefined}
                 >
                   <div>
                     <div className="font-bold text-sm">{p.name}</div>
@@ -762,7 +848,7 @@ export default function App() {
               ))}
             </div>
             {activePlan.status === 'active' && (
-              <button onClick={handleArchiveCurrentPlan} className="text-xs text-slate-400 hover:text-orange-400 flex items-center gap-1 pt-1 underline">
+              <button onClick={handleArchiveCurrentPlan} className="text-xs text-slate-400 flex items-center gap-1 pt-1 underline hover:brightness-125" style={{ color: themeColor }}>
                 <Archive className="w-3 h-3" /> Archive current active plan
               </button>
             )}
@@ -774,7 +860,7 @@ export default function App() {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <PlusCircle className="w-4 h-4 text-orange-400" />
+                  <PlusCircle className="w-4 h-4" style={{ color: themeColor }} />
                   Add Training Plan
                 </h3>
                 <button onClick={() => setShowNewPlanModal(false)} className="text-slate-400 hover:text-white">
@@ -790,7 +876,7 @@ export default function App() {
                     placeholder="e.g. Spring 10k Prep, London HM 2027"
                     value={newPlanName}
                     onChange={(e) => setNewPlanName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -801,7 +887,7 @@ export default function App() {
                       required
                       value={newStartDate}
                       onChange={(e) => setNewStartDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none"
                     />
                   </div>
                   <div>
@@ -811,7 +897,7 @@ export default function App() {
                       required
                       value={newRaceDate}
                       onChange={(e) => setNewRaceDate(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none"
                     />
                   </div>
                 </div>
@@ -823,7 +909,7 @@ export default function App() {
                       placeholder="e.g. 5:30 /km"
                       value={newTargetPace}
                       onChange={(e) => setNewTargetPace(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none"
                     />
                   </div>
                   <div>
@@ -833,14 +919,14 @@ export default function App() {
                       placeholder="e.g. Sub-2:00"
                       value={newTargetTime}
                       onChange={(e) => setNewTargetTime(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none"
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                      <Sparkles className="w-3.5 h-3.5" style={{ color: themeColor }} />
                       Paste Gemini / ChatGPT / Custom AI Plan Text
                     </label>
                     <span className="text-[10px] text-slate-500">Optional</span>
@@ -850,7 +936,7 @@ export default function App() {
                     placeholder="Paste raw workout output from Gemini, Claude, or ChatGPT here (bullet points, markdown tables, or text lines)..."
                     value={pastedPlanText}
                     onChange={(e) => setPastedPlanText(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 font-mono"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none font-mono"
                   />
                   <p className="text-[10px] text-slate-500 mt-0.5">
                     Leave blank to load default 8-week Half-Marathon template.
@@ -866,7 +952,8 @@ export default function App() {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-xl bg-orange-500 text-white text-xs font-bold hover:bg-orange-600 shadow-lg shadow-orange-500/20"
+                    className="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg transition-brightness hover:brightness-110"
+                    style={{ backgroundColor: themeColor }}
                   >
                     Save & Activate
                   </button>
@@ -883,14 +970,13 @@ export default function App() {
             {/* ROW 1: HEADER TITLE */}
             <div className="border-b border-slate-800/80 pb-2">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Calculator className="w-4 h-4 text-orange-400" /> Pace Calculator
+                <Calculator className="w-4 h-4" style={{ color: themeColor }} /> Pace Calculator
               </h3>
             </div>
 
-            {/* ROW 2: ACTUAL PACE CALCULATOR INPUTS WITH STEPPERS */}
-            <div className="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800 w-fit">
-              <span className="text-xs font-semibold text-slate-300">Target Pace:</span>
-              <div className="flex items-center gap-2">
+            {/* ROW 2: CENTERED PACE INPUTS */}
+            <div className="flex justify-center my-1">
+              <div className="flex items-center gap-2 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
                 
                 {/* Minute Input + Arrow Buttons */}
                 <div className="flex items-center bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
@@ -898,7 +984,8 @@ export default function App() {
                     type="text" 
                     value={paceMinStr} 
                     onChange={(e) => setPaceMinStr(e.target.value.replace(/[^0-9]/g, ''))} 
-                    className="w-10 bg-transparent text-center font-bold text-orange-400 py-1 text-sm focus:outline-none" 
+                    className="w-10 bg-transparent text-center font-bold py-1 text-sm focus:outline-none" 
+                    style={{ color: themeColor }}
                   />
                   <div className="flex flex-col border-l border-slate-700/80">
                     <button 
@@ -926,7 +1013,8 @@ export default function App() {
                     type="text" 
                     value={paceSecStr} 
                     onChange={(e) => setPaceSecStr(e.target.value.replace(/[^0-9]/g, ''))} 
-                    className="w-10 bg-transparent text-center font-bold text-orange-400 py-1 text-sm focus:outline-none" 
+                    className="w-10 bg-transparent text-center font-bold py-1 text-sm focus:outline-none" 
+                    style={{ color: themeColor }}
                   />
                   <div className="flex flex-col border-l border-slate-700/80">
                     <button 
@@ -950,26 +1038,32 @@ export default function App() {
               </div>
             </div>
 
-            {/* ROW 3: OPTION 2 - UNIFIED SEGMENTED STRIP (LARGE BOLD NUMBERS) */}
-            <div className="grid grid-cols-4 bg-slate-950 rounded-xl border border-slate-800 divide-x divide-slate-800 text-center py-3 overflow-hidden">
-              <div className="px-1.5 sm:px-2">
-                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">5k</div>
-                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.fiveK}</div>
+            {/* ROW 3: RESTORED 2x2 STACKED CARDS GRID */}
+            <div className="grid grid-cols-2 gap-2 text-center pt-1">
+              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                <div className="text-[10px] uppercase font-bold text-slate-500">5k</div>
+                <div className="text-base font-black text-white mt-0.5">{paceCalculations.fiveK}</div>
               </div>
 
-              <div className="px-1.5 sm:px-2">
-                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">10k</div>
-                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.tenK}</div>
+              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                <div className="text-[10px] uppercase font-bold text-slate-500">10k</div>
+                <div className="text-base font-black text-white mt-0.5">{paceCalculations.tenK}</div>
               </div>
 
-              <div className="px-1.5 sm:px-2">
-                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">16k</div>
-                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.sixteenK}</div>
+              <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                <div className="text-[10px] uppercase font-bold text-slate-500">16k</div>
+                <div className="text-base font-black text-white mt-0.5">{paceCalculations.sixteenK}</div>
               </div>
 
-              <div className="px-1.5 sm:px-2 bg-orange-500/10">
-                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-orange-400 tracking-wider">21.1k</div>
-                <div className="text-sm sm:text-lg font-black text-orange-400 mt-1">{paceCalculations.halfMarathon}</div>
+              <div 
+                className="bg-slate-950/80 p-3 rounded-xl border"
+                style={{ 
+                  borderColor: `${themeColor}4d`,
+                  backgroundColor: `${themeColor}0d` 
+                }}
+              >
+                <div className="text-[10px] uppercase font-bold" style={{ color: themeColor }}>21.1k</div>
+                <div className="text-base font-black mt-0.5" style={{ color: themeColor }}>{paceCalculations.halfMarathon}</div>
               </div>
             </div>
 
@@ -981,9 +1075,10 @@ export default function App() {
             onClick={() => setActiveTab('upcoming')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all ${
               activeTab === 'upcoming'
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                ? 'text-white shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
             }`}
+            style={activeTab === 'upcoming' ? { backgroundColor: themeColor } : undefined}
           >
             <PlayCircle className="w-4 h-4" />
             <span>Upcoming Runs</span>
@@ -992,9 +1087,10 @@ export default function App() {
             onClick={() => setActiveTab('whole')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all ${
               activeTab === 'whole'
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                ? 'text-white shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
             }`}
+            style={activeTab === 'whole' ? { backgroundColor: themeColor } : undefined}
           >
             <Calendar className="w-4 h-4" />
             <span>Whole Plan</span>
@@ -1003,9 +1099,10 @@ export default function App() {
             onClick={() => setActiveTab('previous')}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all ${
               activeTab === 'previous'
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                ? 'text-white shadow-lg'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
             }`}
+            style={activeTab === 'previous' ? { backgroundColor: themeColor } : undefined}
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Previous Runs</span>
@@ -1027,12 +1124,19 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-md border border-orange-500/30">
+                          <span 
+                            className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md border"
+                            style={{ 
+                              backgroundColor: `${themeColor}33`, 
+                              borderColor: `${themeColor}4d`,
+                              color: themeColor 
+                            }}
+                          >
                             Week {weekNum}
                           </span>
                         </div>
                         <div className="text-xs font-semibold text-slate-400">
-                          Total Volume: <strong className="text-orange-400">{weekKmTotal} km</strong>
+                          Total Volume: <strong style={{ color: themeColor }}>{weekKmTotal} km</strong>
                         </div>
                       </div>
                       <div className="space-y-3">
@@ -1063,12 +1167,19 @@ export default function App() {
                   <div key={weekNum} className="space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-wider bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-md border border-orange-500/30">
+                        <span 
+                          className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md border"
+                          style={{ 
+                            backgroundColor: `${themeColor}33`, 
+                            borderColor: `${themeColor}4d`,
+                            color: themeColor 
+                          }}
+                        >
                           Week {weekNum}
                         </span>
                       </div>
                       <div className="text-xs font-semibold text-slate-400">
-                        Total Volume: <strong className="text-orange-400">{weekKmTotal} km</strong>
+                        Total Volume: <strong style={{ color: themeColor }}>{weekKmTotal} km</strong>
                       </div>
                     </div>
                     <div className="space-y-3">
@@ -1095,12 +1206,19 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black uppercase tracking-wider bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-md border border-orange-500/30">
+                          <span 
+                            className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md border"
+                            style={{ 
+                              backgroundColor: `${themeColor}33`, 
+                              borderColor: `${themeColor}4d`,
+                              color: themeColor 
+                            }}
+                          >
                             Week {weekNum}
                           </span>
                         </div>
                         <div className="text-xs font-semibold text-slate-400">
-                          Total Volume: <strong className="text-orange-400">{weekKmTotal} km</strong>
+                          Total Volume: <strong style={{ color: themeColor }}>{weekKmTotal} km</strong>
                         </div>
                       </div>
                       <div className="space-y-3">
