@@ -45,8 +45,8 @@ export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f59e0b', name: 'Solar Amber' },   // 2. Amber
   { hex: '#f43f5e', name: 'Hot Rose' },      // 3. Red
   { hex: '#0891b2', name: 'Electric Cyan' },  // Cool 1 (Teal/Blue)
-  { hex: '#059669', name: 'Forest Emerald'}, // Cool 2 (Green)
-  { hex: '#6366f1', name: 'Royal Indigo' },  // Cool 3 (Purple/Blue)
+  { hex: '#10b981', name: 'Mint Emerald' },  // 5. Crisp Green
+  { hex: '#d946ef', name: 'Hot Magenta' },   // 6. Punchy Magenta
 ];
 
 const DEFAULT_WORKOUTS: Workout[] = [
