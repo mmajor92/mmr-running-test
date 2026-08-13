@@ -651,9 +651,9 @@ export default function App() {
           <div className="relative z-10 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                {/* MMR RUNNING HUB BADGE: FADED THEME TINT BG + WHITE TEXT */}
+                {/* MMR RUNNING HUB BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                 <div 
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border text-white"
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border text-slate-300"
                   style={{ 
                     backgroundColor: `${themeColor}26`, 
                     borderColor: `${themeColor}4d`,
@@ -759,9 +759,9 @@ export default function App() {
                 {activePlan.name}
               </h1>
               {daysUntilRace > 0 && (
-                /* COUNTDOWN BADGE: FADED THEME TINT BG + WHITE TEXT */
+                /* COUNTDOWN BADGE: FADED THEME TINT BG + SLATE-300 TEXT */
                 <div 
-                  className="flex items-center gap-1.5 text-xs font-bold text-white border px-3 py-1 rounded-full"
+                  className="flex items-center gap-1.5 text-xs font-bold text-slate-300 border px-3 py-1 rounded-full"
                   style={{ 
                     backgroundColor: `${themeColor}26`, 
                     borderColor: `${themeColor}4d`,
@@ -773,9 +773,10 @@ export default function App() {
               )}
             </div>
 
+            {/* TOTAL DISTANCE / VOLUME SECTION WITH SLATE-300 LABEL TEXT */}
             <div className="space-y-1.5 pt-1">
-              <div className="flex justify-between items-center text-xs text-slate-400">
-                <span className="flex items-center gap-1 text-slate-200">
+              <div className="flex justify-between items-center text-xs text-slate-300">
+                <span className="flex items-center gap-1 text-slate-300">
                   <BarChart3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
                   Week {currentWeekNum} Volume: <strong style={{ color: themeColor }}>{currentWeekKm} km</strong>
                 </span>
@@ -1123,9 +1124,9 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
+                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                           <span 
-                            className="text-xs font-black capitlize tracking-wider text-white px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
@@ -1166,9 +1167,9 @@ export default function App() {
                   <div key={weekNum} className="space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                       <div className="flex items-center gap-2">
-                        {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
+                        {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                         <span 
-                          className="text-xs font-black capitlize tracking-wider text-white px-2.5 py-1 rounded-md border"
+                          className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                           style={{ 
                             backgroundColor: `${themeColor}26`, 
                             borderColor: `${themeColor}4d`,
@@ -1205,9 +1206,9 @@ export default function App() {
                     <div key={weekNum} className="space-y-3">
                       <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
                         <div className="flex items-center gap-2">
-                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + WHITE TEXT */}
+                          {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                           <span 
-                            className="text-xs font-black capitalize tracking-wider text-white px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
