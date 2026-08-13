@@ -42,9 +42,9 @@ export interface ThemeColor {
 
 export const THEME_COLORS: ThemeColor[] = [
   { hex: '#f97316', name: 'Energy Orange' },
-  { hex: '#00ff66', name: 'Hyper Emerald' },
-  { hex: '#00f0ff', name: 'Laser Cyan' },
-  { hex: '#d946ef', name: 'Electric Fuchsia' },
+  { hex: '#22c55e', name: 'Active Green' },
+  { hex: '#38bdf8', name: 'Sky Cerulean' },
+  { hex: '#a855f7', name: 'Vibrant Iris' },
   { hex: '#f43f5e', name: 'Hot Rose' },
   { hex: '#f59e0b', name: 'Solar Amber' },
 ];
@@ -543,9 +543,9 @@ export default function App() {
       case 'progression': 
         return 'border-emerald-500/80 bg-emerald-950/20 text-emerald-400';
       case 'shakeout': 
-        return 'border-blue-500/80 bg-blue-950/20 text-blue-400';
+        return 'border-sky-500/80 bg-sky-950/20 text-sky-400';
       case 'longrun': 
-        return 'border-orange-500/80 bg-orange-950/20 text-orange-400';
+        return 'border-amber-600/80 bg-amber-950/20 text-amber-500';
       case 'raceday': 
         return 'border-rose-500/80 bg-rose-950/20 text-rose-400';
       default: 
