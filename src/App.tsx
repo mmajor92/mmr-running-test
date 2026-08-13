@@ -950,26 +950,26 @@ export default function App() {
               </div>
             </div>
 
-            {/* ROW 3: OPTION 2 - UNIFIED SEGMENTED STRIP */}
-            <div className="grid grid-cols-4 bg-slate-950 rounded-xl border border-slate-800 divide-x divide-slate-800 text-center py-2.5 overflow-hidden">
-              <div className="px-1">
-                <div className="text-[10px] uppercase font-bold text-slate-500">5k</div>
-                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.fiveK}</div>
+            {/* ROW 3: OPTION 2 - UNIFIED SEGMENTED STRIP (LARGE BOLD NUMBERS) */}
+            <div className="grid grid-cols-4 bg-slate-950 rounded-xl border border-slate-800 divide-x divide-slate-800 text-center py-3 overflow-hidden">
+              <div className="px-1.5 sm:px-2">
+                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">5k</div>
+                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.fiveK}</div>
               </div>
 
-              <div className="px-1">
-                <div className="text-[10px] uppercase font-bold text-slate-500">10k</div>
-                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.tenK}</div>
+              <div className="px-1.5 sm:px-2">
+                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">10k</div>
+                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.tenK}</div>
               </div>
 
-              <div className="px-1">
-                <div className="text-[10px] uppercase font-bold text-slate-500">16k</div>
-                <div className="text-xs sm:text-sm font-black text-white mt-0.5">{paceCalculations.sixteenK}</div>
+              <div className="px-1.5 sm:px-2">
+                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-slate-500 tracking-wider">16k</div>
+                <div className="text-sm sm:text-lg font-black text-white mt-1">{paceCalculations.sixteenK}</div>
               </div>
 
-              <div className="px-1 bg-orange-500/10">
-                <div className="text-[10px] uppercase font-bold text-orange-400">21.1k</div>
-                <div className="text-xs sm:text-sm font-black text-orange-400 mt-0.5">{paceCalculations.halfMarathon}</div>
+              <div className="px-1.5 sm:px-2 bg-orange-500/10">
+                <div className="text-[10px] sm:text-xs uppercase font-extrabold text-orange-400 tracking-wider">21.1k</div>
+                <div className="text-sm sm:text-lg font-black text-orange-400 mt-1">{paceCalculations.halfMarathon}</div>
               </div>
             </div>
 
