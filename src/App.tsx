@@ -545,9 +545,9 @@ export default function App() {
       case 'shakeout': 
         return 'border-sky-500/80 bg-sky-950/20 text-sky-400';
       case 'longrun': 
-        return 'border-amber-600/80 bg-amber-950/20 text-amber-500';
-      case 'raceday': 
         return 'border-rose-500/80 bg-rose-950/20 text-rose-400';
+      case 'raceday': 
+        return 'border-amber-400 bg-amber-950/30 text-amber-300 font-bold';
       default: 
         return 'border-slate-800 bg-slate-900 text-slate-200';
     }
