@@ -6,6 +6,7 @@ import { PlanManager } from './components/PlanManager';
 import { TabBar } from './components/TabBar';
 import { WorkoutList } from './components/WorkoutList';
 import type { ExportScope } from './components/ExportMenu';
+import { useCompletions } from './hooks/useCompletions';
 import { useCopyToClipboard } from './hooks/useCopyToClipboard';
 import { usePlans } from './hooks/usePlans';
 import { useToday } from './hooks/useToday';
@@ -34,12 +35,16 @@ function AppContent() {
   const [notice, setNotice] = useState<string | null>(null);
 
   const { copiedId, failedId, copy } = useCopyToClipboard();
+  const { completedIds, toggleCompleted } = useCompletions();
 
   // Expanded cards are per-plan. Keeping one global map meant a card stayed
   // open after switching plans whenever two plans shared a workout id.
   useEffect(() => setExpandedIds(new Set()), [activePlanId]);
 
-  const stats = useMemo(() => computePlanStats(activePlan, todayStr), [activePlan, todayStr]);
+  const stats = useMemo(
+    () => computePlanStats(activePlan, todayStr, completedIds),
+    [activePlan, todayStr, completedIds],
+  );
 
   const { upcoming, previous } = useMemo(
     () => splitByDate(activePlan.workouts, todayStr),
@@ -60,6 +65,11 @@ function AppContent() {
       return next;
     });
   }, []);
+
+  const handleToggleCompleted = useCallback(
+    (workoutId: string) => toggleCompleted(workoutId, todayStr),
+    [toggleCompleted, todayStr],
+  );
 
   const handleCopy = useCallback(
     (workoutId: string, text: string) => {
@@ -173,11 +183,13 @@ function AppContent() {
             workouts={visibleWorkouts}
             todayStr={todayStr}
             expandedIds={expandedIds}
+            completedIds={completedIds}
             copiedId={copiedId}
             failedId={failedId}
             onToggle={handleToggleWorkout}
             onCopy={handleCopy}
             onAddToCalendar={handleAddToCalendar}
+            onToggleCompleted={handleToggleCompleted}
             weekOrder={activeTab === 'previous' ? 'desc' : 'asc'}
             emptyMessage={EMPTY_MESSAGES[activeTab]}
           />

@@ -108,7 +108,7 @@ export function PlanHeader({
               <strong style={{ color }}>{formatKm(stats.currentWeekKm)} km</strong>
             </span>
             <span>
-              {formatKm(stats.completedKm)} / {formatKm(stats.totalKm)} km total
+              {formatKm(stats.loggedKm)} / {formatKm(stats.coreKm)} km logged
             </span>
           </div>
 
@@ -118,12 +118,23 @@ export function PlanHeader({
             aria-valuenow={Math.round(stats.progressPercent)}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label="Plan distance completed"
+            aria-label="Plan distance logged"
           >
             <div
               className="h-full transition-all duration-300"
               style={{ width: `${stats.progressPercent}%`, backgroundColor: color }}
             />
+          </div>
+
+          <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500">
+            <span>
+              {stats.loggedCount} of {stats.coreCount} core runs ticked off
+            </span>
+            {stats.bonusCount > 0 && (
+              <span className="font-semibold text-emerald-400">
+                +{formatKm(stats.bonusKm)} km bonus
+              </span>
+            )}
           </div>
         </div>
       </div>

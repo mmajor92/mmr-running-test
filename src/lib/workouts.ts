@@ -62,26 +62,57 @@ export function currentWeekNumber(workouts: readonly Workout[], todayStr: string
   return Math.max(...workouts.map((workout) => workout.weekNumber));
 }
 
-/** All derived figures for the header, computed once. Guards divide-by-zero. */
-export function computePlanStats(plan: TrainingPlan, todayStr: string): PlanStats {
+/**
+ * Is this run optional?
+ *
+ * Derived from the text rather than stored as a field, deliberately: it works
+ * on plans already saved in localStorage, with no migration needed.
+ */
+export function isOptionalWorkout(workout: Workout): boolean {
+  return /optional/i.test(workout.workoutType) || /optional/i.test(workout.advice);
+}
+
+/**
+ * All derived figures for the header, computed once.
+ *
+ * Optional runs are excluded from the target, so the progress bar can actually
+ * reach 100% for someone who skips them. Ticking one adds to `bonusKm` instead.
+ */
+export function computePlanStats(
+  plan: TrainingPlan,
+  todayStr: string,
+  completedIds: ReadonlySet<string>,
+): PlanStats {
   const weekNumber = currentWeekNumber(plan.workouts, todayStr);
   const currentWeekWorkouts = plan.workouts.filter((w) => w.weekNumber === weekNumber);
 
-  const totalKm = sumKm(plan.workouts);
-  const completedKm = sumKm(plan.workouts.filter((w) => w.dateStr < todayStr));
+  const coreWorkouts = plan.workouts.filter((w) => !isOptionalWorkout(w));
+  const optionalWorkouts = plan.workouts.filter(isOptionalWorkout);
+
+  const loggedCore = coreWorkouts.filter((w) => completedIds.has(w.id));
+  const loggedOptional = optionalWorkouts.filter((w) => completedIds.has(w.id));
+
+  const coreKm = sumKm(coreWorkouts);
+  const loggedKm = sumKm(loggedCore);
+  const bonusKm = sumKm(loggedOptional);
 
   const progressPercent =
-    totalKm > 0 ? Math.min(100, Math.max(0, (completedKm / totalKm) * 100)) : 0;
-
-  const daysUntilRace = Math.max(0, daysBetweenISO(todayStr, plan.raceDateStr));
+    coreKm > 0 ? Math.min(100, Math.max(0, (loggedKm / coreKm) * 100)) : 0;
 
   return {
     currentWeekNumber: weekNumber,
     currentWeekKm: sumKm(currentWeekWorkouts),
-    completedKm,
-    totalKm,
+    loggedKm,
+    bonusKm,
+    coreKm,
+    totalKm: sumKm(plan.workouts),
+    elapsedKm: sumKm(plan.workouts.filter((w) => w.dateStr < todayStr)),
+    loggedCount: loggedCore.length,
+    coreCount: coreWorkouts.length,
+    bonusCount: loggedOptional.length,
+    totalCount: plan.workouts.length,
     progressPercent,
-    daysUntilRace,
+    daysUntilRace: Math.max(0, daysBetweenISO(todayStr, plan.raceDateStr)),
   };
 }
 

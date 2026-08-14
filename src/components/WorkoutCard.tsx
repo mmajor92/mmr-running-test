@@ -1,6 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
-import { CalendarPlus, Check, ChevronDown, ChevronUp, Copy, X } from 'lucide-react';
+import { CalendarPlus, Check, CheckCircle2, ChevronDown, ChevronUp, Circle, Copy, X } from 'lucide-react';
 import { CATEGORY_STYLES, FALLBACK_CATEGORY_STYLE } from '../constants';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import type { Workout } from '../types';
@@ -11,10 +11,15 @@ export interface WorkoutCardProps {
   workout: Workout;
   isToday: boolean;
   isExpanded: boolean;
+  isCompleted: boolean;
+  isOptional: boolean;
+  /** False for runs in the future - you cannot have done tomorrow's session. */
+  canComplete: boolean;
   copyState: CopyState;
   onToggle: (workoutId: string) => void;
   onCopy: (workoutId: string, text: string) => void;
   onAddToCalendar: (workout: Workout) => void;
+  onToggleCompleted: (workoutId: string) => void;
 }
 
 /**
@@ -25,10 +30,14 @@ function WorkoutCardBase({
   workout,
   isToday,
   isExpanded,
+  isCompleted,
+  isOptional,
+  canComplete,
   copyState,
   onToggle,
   onCopy,
   onAddToCalendar,
+  onToggleCompleted,
 }: WorkoutCardProps) {
   const { color, tint } = useTheme();
 
@@ -42,6 +51,14 @@ function WorkoutCardBase({
       onCopy(workout.id, workout.stravaTitle);
     },
     [onCopy, workout.id, workout.stravaTitle],
+  );
+
+  const handleCompleted = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onToggleCompleted(workout.id);
+    },
+    [onToggleCompleted, workout.id],
   );
 
   const handleCalendar = useCallback(
@@ -66,14 +83,22 @@ function WorkoutCardBase({
       }`}
       style={ringStyle}
     >
-      {isToday && (
-        <div className="mb-2">
-          <span
-            className="inline-block text-[10px] font-black uppercase text-white px-2 py-0.5 rounded-full shadow-sm"
-            style={{ backgroundColor: color }}
-          >
-            Today
-          </span>
+      {(isToday || isCompleted) && (
+        <div className="mb-2 flex items-center gap-1.5">
+          {isToday && (
+            <span
+              className="inline-block text-[10px] font-black uppercase text-white px-2 py-0.5 rounded-full shadow-sm"
+              style={{ backgroundColor: color }}
+            >
+              Today
+            </span>
+          )}
+          {isCompleted && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+              <Check className="w-3 h-3" />
+              Done
+            </span>
+          )}
         </div>
       )}
 
@@ -85,6 +110,12 @@ function WorkoutCardBase({
             </span>
             <span className="shrink-0">•</span>
             <span className="shrink-0">Week {workout.weekNumber}</span>
+            {isOptional && (
+              <React.Fragment>
+                <span className="shrink-0">•</span>
+                <span className="shrink-0 text-slate-500 font-medium">Optional</span>
+              </React.Fragment>
+            )}
           </div>
           <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">
             {workout.workoutType}
@@ -92,9 +123,38 @@ function WorkoutCardBase({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-          <span className="font-black text-sm sm:text-base mr-1" style={{ color }}>
+          <span
+            className="font-black text-sm sm:text-base mr-1"
+            style={{ color: isCompleted ? '#34d399' : color }}
+          >
             {workout.totalKm}
           </span>
+
+          {canComplete && (
+          <button
+            type="button"
+            onClick={handleCompleted}
+            className={`p-2 rounded-xl border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+              isCompleted
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
+            style={{ outlineColor: color }}
+            aria-pressed={isCompleted}
+            aria-label={
+              isCompleted
+                ? `Mark ${workout.workoutType} as not done`
+                : `Mark ${workout.workoutType} as done`
+            }
+            title={isCompleted ? 'Tap to un-tick this run' : 'Tick off this run'}
+          >
+            {isCompleted ? (
+              <CheckCircle2 className="w-4 h-4" />
+            ) : (
+              <Circle className="w-4 h-4" />
+            )}
+          </button>
+          )}
 
           <button
             type="button"

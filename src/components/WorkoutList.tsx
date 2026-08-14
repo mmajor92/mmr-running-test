@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { groupByWeek, sortedWeekNumbers, sumKm } from '../lib/workouts';
+import { groupByWeek, isOptionalWorkout, sortedWeekNumbers, sumKm } from '../lib/workouts';
 import { WeekHeading } from './WeekHeading';
 import { WorkoutCard } from './WorkoutCard';
 import type { CopyState } from './WorkoutCard';
@@ -9,11 +9,13 @@ export interface WorkoutListProps {
   workouts: readonly Workout[];
   todayStr: string;
   expandedIds: ReadonlySet<string>;
+  completedIds: ReadonlySet<string>;
   copiedId: string | null;
   failedId: string | null;
   onToggle: (workoutId: string) => void;
   onCopy: (workoutId: string, text: string) => void;
   onAddToCalendar: (workout: Workout) => void;
+  onToggleCompleted: (workoutId: string) => void;
   /** 'desc' puts the most recent week first, for the Previous Runs tab. */
   weekOrder?: 'asc' | 'desc';
   emptyMessage: string;
@@ -28,11 +30,13 @@ export function WorkoutList({
   workouts,
   todayStr,
   expandedIds,
+  completedIds,
   copiedId,
   failedId,
   onToggle,
   onCopy,
   onAddToCalendar,
+  onToggleCompleted,
   weekOrder = 'asc',
   emptyMessage,
 }: WorkoutListProps) {
@@ -67,10 +71,14 @@ export function WorkoutList({
                   workout={workout}
                   isToday={workout.dateStr === todayStr}
                   isExpanded={expandedIds.has(workout.id)}
+                  isCompleted={completedIds.has(workout.id)}
+                  isOptional={isOptionalWorkout(workout)}
+                  canComplete={workout.dateStr <= todayStr}
                   copyState={copyStateFor(workout.id)}
                   onToggle={onToggle}
                   onCopy={onCopy}
                   onAddToCalendar={onAddToCalendar}
+                  onToggleCompleted={onToggleCompleted}
                 />
               ))}
             </div>

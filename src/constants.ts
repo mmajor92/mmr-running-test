@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
   plans: 'hm_training_plans',
   activePlanId: 'hm_active_plan_id',
   themeColor: 'hm_theme_color',
+  completions: 'hm_completed_workouts',
 } as const;
 
 /**

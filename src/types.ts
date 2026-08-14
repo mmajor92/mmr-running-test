@@ -67,11 +67,28 @@ export interface PlanDraft {
 export interface PlanStats {
   currentWeekNumber: number;
   currentWeekKm: number;
-  completedKm: number;
+  /** Ticked-off distance from required runs only. */
+  loggedKm: number;
+  /** Ticked-off distance from optional runs. Credit on top, not part of target. */
+  bonusKm: number;
+  /** The target: total distance of required runs, optional ones excluded. */
+  coreKm: number;
+  /** Every run in the plan, optional included. For reference only. */
   totalKm: number;
-  /** 0-100, already clamped and never NaN. */
+  /** Distance from runs whose date has passed, ticked or not. */
+  elapsedKm: number;
+  /** Required runs ticked off. */
+  loggedCount: number;
+  coreCount: number;
+  /** Optional runs ticked off. */
+  bonusCount: number;
+  totalCount: number;
+  /** 0-100, logged over core. Reaches 100 without any optional runs. */
   progressPercent: number;
   daysUntilRace: number;
 }
 
 export type WorkoutsByWeek = Record<number, Workout[]>;
+
+/** Workout id -> the date it was ticked off, as YYYY-MM-DD. */
+export type CompletionMap = Record<string, string>;
