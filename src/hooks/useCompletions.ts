@@ -1,57 +1,48 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { STORAGE_KEYS } from '../constants';
 import { usePersistentState } from './usePersistentState';
-import type { CompletionMap } from '../types';
+import type { CompletionMap, CompletionState } from '../types';
 
 /**
- * Only recognises `{ workoutId: "2026-08-14" }` shaped data, so a corrupt or
- * outdated payload falls back to empty rather than breaking the app.
+ * Accepts the current format ('done' / 'skipped') and the previous one, where
+ * the value was the date a run was ticked off. Any old date is read as 'done',
+ * so data already saved on a phone carries over rather than being lost.
  */
 function reviveCompletions(parsed: unknown): CompletionMap | null {
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return null;
 
   const result: CompletionMap = {};
   for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-    if (typeof value === 'string' && value.length > 0) result[key] = value;
+    if (value === 'done' || value === 'skipped') {
+      result[key] = value;
+    } else if (typeof value === 'string' && value.length > 0) {
+      result[key] = 'done'; // Legacy format: the value used to be a date string.
+    }
   }
   return result;
 }
 
 export interface UseCompletionsResult {
-  /** Set of workout ids the runner has ticked off. */
-  completedIds: ReadonlySet<string>;
-  toggleCompleted: (workoutId: string, todayStr: string) => void;
-  isCompleted: (workoutId: string) => boolean;
+  /** Only explicit choices. Anything absent falls back to the default. */
+  overrides: CompletionMap;
+  setStatus: (workoutId: string, status: CompletionState) => void;
 }
 
 export function useCompletions(): UseCompletionsResult {
-  const [completions, setCompletions] = usePersistentState<CompletionMap>(
+  const [overrides, setOverrides] = usePersistentState<CompletionMap>(
     STORAGE_KEYS.completions,
     reviveCompletions,
     () => ({}),
   );
 
-  const completedIds = useMemo(() => new Set(Object.keys(completions)), [completions]);
-
-  const toggleCompleted = useCallback(
-    (workoutId: string, todayStr: string) => {
-      setCompletions((prev) => {
-        if (workoutId in prev) {
-          // Rebuild without the key rather than mutating, so React sees a change.
-          const next = { ...prev };
-          delete next[workoutId];
-          return next;
-        }
-        return { ...prev, [workoutId]: todayStr };
-      });
+  const setStatus = useCallback(
+    (workoutId: string, status: CompletionState) => {
+      setOverrides((prev) =>
+        prev[workoutId] === status ? prev : { ...prev, [workoutId]: status },
+      );
     },
-    [setCompletions],
+    [setOverrides],
   );
 
-  const isCompleted = useCallback(
-    (workoutId: string) => workoutId in completions,
-    [completions],
-  );
-
-  return { completedIds, toggleCompleted, isCompleted };
+  return { overrides, setStatus };
 }

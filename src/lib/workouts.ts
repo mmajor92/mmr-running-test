@@ -1,4 +1,10 @@
-import type { PlanStats, TrainingPlan, Workout, WorkoutsByWeek } from '../types';
+import type {
+  CompletionMap,
+  PlanStats,
+  TrainingPlan,
+  Workout,
+  WorkoutsByWeek,
+} from '../types';
 import { daysBetweenISO } from './date';
 
 /** Replaces the three near-identical grouping memos in the old App.tsx. */
@@ -70,6 +76,38 @@ export function currentWeekNumber(workouts: readonly Workout[], todayStr: string
  */
 export function isOptionalWorkout(workout: Workout): boolean {
   return /optional/i.test(workout.workoutType) || /optional/i.test(workout.advice);
+}
+
+/**
+ * Has this run been done?
+ *
+ * The default is optimistic for required runs whose day has already passed -
+ * you will skip far fewer than you complete, so only the exceptions need
+ * tapping. Today's run is not assumed, because the day is not over yet, and
+ * optional runs are never assumed because they are skipped often.
+ */
+export function isRunCompleted(
+  workout: Workout,
+  overrides: CompletionMap,
+  todayStr: string,
+): boolean {
+  const override = overrides[workout.id];
+  if (override) return override === 'done';
+
+  return !isOptionalWorkout(workout) && workout.dateStr < todayStr;
+}
+
+/** The ids of every run currently counted as done, defaults included. */
+export function completedWorkoutIds(
+  workouts: readonly Workout[],
+  overrides: CompletionMap,
+  todayStr: string,
+): Set<string> {
+  const ids = new Set<string>();
+  for (const workout of workouts) {
+    if (isRunCompleted(workout, overrides, todayStr)) ids.add(workout.id);
+  }
+  return ids;
 }
 
 /**
