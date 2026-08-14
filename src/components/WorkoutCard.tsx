@@ -1,6 +1,6 @@
 import React, { memo, useCallback } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
-import { CalendarPlus, Check, CheckCircle2, ChevronDown, ChevronUp, Circle, Copy, X } from 'lucide-react';
+import { CalendarPlus, Check, CheckCircle2, ChevronDown, ChevronUp, Copy, X } from 'lucide-react';
 import { CATEGORY_STYLES, FALLBACK_CATEGORY_STYLE } from '../constants';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import type { Workout } from '../types';
@@ -12,7 +12,6 @@ export interface WorkoutCardProps {
   isToday: boolean;
   isExpanded: boolean;
   isCompleted: boolean;
-  isOptional: boolean;
   /** False for runs in the future - you cannot have done tomorrow's session. */
   canComplete: boolean;
   copyState: CopyState;
@@ -31,7 +30,6 @@ function WorkoutCardBase({
   isToday,
   isExpanded,
   isCompleted,
-  isOptional,
   canComplete,
   copyState,
   onToggle,
@@ -104,27 +102,21 @@ function WorkoutCardBase({
 
       <div className="flex justify-between items-start gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-slate-400 min-w-0">
             <span className="shrink-0">
               {workout.dayName}, {workout.displayDate}
             </span>
             <span className="shrink-0">•</span>
             <span className="shrink-0">Week {workout.weekNumber}</span>
-            {isOptional && (
-              <React.Fragment>
-                <span className="shrink-0">•</span>
-                <span className="shrink-0 text-slate-500 font-medium">Optional</span>
-              </React.Fragment>
-            )}
           </div>
           <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">
             {workout.workoutType}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <span
-            className="font-black text-sm sm:text-base mr-1"
+            className="font-black text-xs sm:text-base mr-0.5 sm:mr-1 whitespace-nowrap"
             style={{ color: isCompleted ? '#34d399' : color }}
           >
             {workout.totalKm}
@@ -134,10 +126,10 @@ function WorkoutCardBase({
           <button
             type="button"
             onClick={handleCompleted}
-            className={`p-2 rounded-xl border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+            className={`p-1.5 sm:p-2 rounded-xl border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
               isCompleted
-                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                : 'bg-slate-800/60 hover:bg-slate-700 border-slate-700/80 text-slate-600 hover:text-slate-400'
             }`}
             style={{ outlineColor: color }}
             aria-pressed={isCompleted}
@@ -148,18 +140,14 @@ function WorkoutCardBase({
             }
             title={isCompleted ? 'Tap to un-tick this run' : 'Tick off this run'}
           >
-            {isCompleted ? (
-              <CheckCircle2 className="w-4 h-4" />
-            ) : (
-              <Circle className="w-4 h-4" />
-            )}
+            <CheckCircle2 className="w-4 h-4" />
           </button>
           )}
 
           <button
             type="button"
             onClick={handleCalendar}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="p-1.5 sm:p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ outlineColor: color }}
             aria-label={`Add ${workout.workoutType} to Google Calendar`}
             title="Add run to Google Calendar"
@@ -170,7 +158,7 @@ function WorkoutCardBase({
           <button
             type="button"
             onClick={handleCopy}
-            className="p-2 rounded-xl border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="p-1.5 sm:p-2 rounded-xl border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
               backgroundColor: tint(ALPHA.soft),
               borderColor: tint(ALPHA.border),
