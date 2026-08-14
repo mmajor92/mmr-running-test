@@ -128,7 +128,7 @@ export function PlanHeader({
 
           {stats.bonusCount > 0 && (
             <p className="text-[11px] font-semibold text-emerald-400 text-right">
-              +{formatKm(stats.bonusKm)} km bonus from optional runs
+              +{formatKm(stats.bonusKm)} km
             </p>
           )}
         </div>
