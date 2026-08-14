@@ -51,7 +51,6 @@ export const DEFAULT_WORKOUTS: readonly Workout[] = [
 export const INITIAL_PLAN: TrainingPlan = {
   id: 'plan-1',
   name: 'Saucony Run Shoreditch Prep',
-  targetPace: '5:40 /km',
   startDateStr: TEMPLATE_START_DATE,
   raceDateStr: TEMPLATE_RACE_DATE,
   raceDateDisplay: formatLongDateISO(TEMPLATE_RACE_DATE),

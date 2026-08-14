@@ -21,6 +21,7 @@ export interface UsePlansResult {
   activePlanId: string;
   selectPlan: (planId: string) => void;
   addPlan: (plan: TrainingPlan) => void;
+  updatePlan: (plan: TrainingPlan) => void;
   archivePlan: (planId: string) => void;
   deletePlan: (planId: string) => { ok: boolean; reason?: string };
 }
@@ -76,6 +77,14 @@ export function usePlans(todayStr: string): UsePlansResult {
     [setPlans, setActivePlanId],
   );
 
+  /** Replaces a plan in place, keeping its position in the list. */
+  const updatePlan = useCallback(
+    (updated: TrainingPlan) => {
+      setPlans((prev) => prev.map((plan) => (plan.id === updated.id ? updated : plan)));
+    },
+    [setPlans],
+  );
+
   const archivePlan = useCallback(
     (planId: string) => {
       setPlans((prev) =>
@@ -110,6 +119,7 @@ export function usePlans(todayStr: string): UsePlansResult {
     activePlanId: activePlan.id,
     selectPlan,
     addPlan,
+    updatePlan,
     archivePlan,
     deletePlan,
   };

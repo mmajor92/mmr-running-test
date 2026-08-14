@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Archive, PlusCircle, Trash2 } from 'lucide-react';
+import { Archive, PencilLine, PlusCircle, Trash2 } from 'lucide-react';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import type { TrainingPlan } from '../types';
 
@@ -10,6 +10,7 @@ interface PlanManagerProps {
   onDelete: (planId: string) => { ok: boolean; reason?: string };
   onArchiveActive: () => void;
   onAddPlan: () => void;
+  onEditPlan: (planId: string) => void;
   activePlanStatus: TrainingPlan['status'];
 }
 
@@ -20,6 +21,7 @@ export function PlanManager({
   onDelete,
   onArchiveActive,
   onAddPlan,
+  onEditPlan,
   activePlanStatus,
 }: PlanManagerProps) {
   const { color, tint } = useTheme();
@@ -106,6 +108,16 @@ export function PlanManager({
                       Active
                     </span>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={() => onEditPlan(plan.id)}
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                    aria-label={`Edit ${plan.name}`}
+                    title="Edit plan"
+                  >
+                    <PencilLine className="w-4 h-4" />
+                  </button>
 
                   <button
                     type="button"

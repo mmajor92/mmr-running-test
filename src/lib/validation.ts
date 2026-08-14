@@ -104,7 +104,6 @@ export function normalizePlan(raw: unknown, index = 0): TrainingPlan | null {
   return {
     id: asString(raw.id) || `plan-${Date.now()}-${index}`,
     name: asString(raw.name, 'Untitled plan').trim() || 'Untitled plan',
-    targetPace: asString(raw.targetPace, '5:40 /km'),
     startDateStr,
     raceDateStr,
     raceDateDisplay:

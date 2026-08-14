@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { PlusCircle, Sparkles } from 'lucide-react';
+import { PencilLine, PlusCircle, Sparkles } from 'lucide-react';
 import { createTemplateWorkouts, templateRaceDateFor } from '../data/defaultPlan';
 import { addDaysISO, formatLongDateISO, isValidISODate, todayISO } from '../lib/date';
 import { parsePastedPlan } from '../lib/parsePlan';
@@ -8,10 +8,12 @@ import { useTheme } from '../theme/ThemeContext';
 import { Modal } from './Modal';
 import type { PlanDraft, TrainingPlan } from '../types';
 
-interface NewPlanModalProps {
+interface PlanModalProps {
   onClose: () => void;
-  onCreate: (plan: TrainingPlan) => void;
+  onSave: (plan: TrainingPlan) => void;
   todayStr: string;
+  /** Present when editing. Absent when creating a new plan. */
+  existingPlan?: TrainingPlan;
 }
 
 const EIGHT_WEEKS = 56;
@@ -22,19 +24,47 @@ function createEmptyDraft(): PlanDraft {
     name: '',
     startDateStr: start,
     raceDateStr: addDaysISO(start, EIGHT_WEEKS) ?? start,
-    targetPace: '5:40 /km',
     targetTime: '< 2:00:00',
     pastedText: '',
   };
+}
+
+function draftFromPlan(plan: TrainingPlan): PlanDraft {
+  return {
+    name: plan.name,
+    startDateStr: plan.startDateStr,
+    raceDateStr: plan.raceDateStr,
+    targetTime: plan.targetTime,
+    pastedText: '',
+  };
+}
+
+/**
+ * Opens the browser's native calendar on click.
+ * On desktop, a date input only opens its picker when you hit the small
+ * calendar icon, which is fiddly. showPicker() makes the whole field behave
+ * like the mobile one. It throws on older browsers, so the call is guarded.
+ */
+function openDatePicker(event: { currentTarget: HTMLInputElement }) {
+  try {
+    event.currentTarget.showPicker?.();
+  } catch {
+    // Unsupported or blocked - the field still works as a normal date input.
+  }
 }
 
 const inputClass =
   'w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-slate-600';
 const labelClass = 'text-xs font-semibold text-slate-300 block mb-1';
 
-export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps) {
+/** Handles both creating a plan and editing an existing one. */
+export function NewPlanModal({ onClose, onSave, todayStr, existingPlan }: PlanModalProps) {
   const { color } = useTheme();
-  const [draft, setDraft] = useState<PlanDraft>(createEmptyDraft);
+  const isEditing = existingPlan !== undefined;
+
+  const [draft, setDraft] = useState<PlanDraft>(() =>
+    existingPlan ? draftFromPlan(existingPlan) : createEmptyDraft(),
+  );
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
 
@@ -44,7 +74,6 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
     setWarnings([]);
   };
 
-  /** Dates are validated here rather than trusted from the input element. */
   const validationErrors = useMemo(() => {
     const found: string[] = [];
     if (!draft.name.trim()) found.push('Give the plan a name.');
@@ -60,6 +89,10 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
     return found;
   }, [draft.name, draft.startDateStr, draft.raceDateStr]);
 
+  /** Editing dates does not move existing sessions, so say so up front. */
+  const datesMoved =
+    isEditing && existingPlan !== undefined && draft.startDateStr !== existingPlan.startDateStr;
+
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
@@ -68,10 +101,10 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
       return;
     }
 
-    const planId = `plan-${Date.now()}`;
+    const planId = existingPlan?.id ?? `plan-${Date.now()}`;
     const name = draft.name.trim();
     let raceDateStr = draft.raceDateStr;
-    let workouts;
+    let workouts: TrainingPlan['workouts'];
 
     if (draft.pastedText.trim()) {
       const result = parsePastedPlan(draft.pastedText, draft.startDateStr, name);
@@ -80,30 +113,34 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
         setErrors(
           result.warnings.length > 0
             ? result.warnings
-            : ['No sessions were recognised. Clear the box to use the built-in template.'],
+            : ['No sessions were recognised in that text.'],
         );
         return;
       }
 
-      // Show what was inferred once, and let a second press confirm.
-      if (result.warnings.length > 0 && warnings.length === 0) {
-        setWarnings([
-          ...result.warnings,
-          `${result.workouts.length} sessions ready. Press save again to continue.`,
-        ]);
+      const pending = [...result.warnings];
+      if (isEditing) {
+        pending.push(`This replaces all ${existingPlan.workouts.length} existing sessions.`);
+      }
+      pending.push(`${result.workouts.length} sessions ready. Press save again to continue.`);
+
+      if (warnings.length === 0) {
+        setWarnings(pending);
         return;
       }
 
       workouts = result.workouts;
+    } else if (existingPlan) {
+      // Editing with an empty paste box keeps the schedule exactly as it is.
+      workouts = existingPlan.workouts;
     } else {
       workouts = createTemplateWorkouts(draft.startDateStr, planId);
       raceDateStr = templateRaceDateFor(draft.startDateStr);
     }
 
-    onCreate({
+    onSave({
       id: planId,
       name,
-      targetPace: draft.targetPace.trim() || '-',
       startDateStr: draft.startDateStr,
       raceDateStr,
       raceDateDisplay: formatLongDateISO(raceDateStr),
@@ -118,8 +155,12 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
       onClose={onClose}
       title={
         <React.Fragment>
-          <PlusCircle className="w-4 h-4" style={{ color }} />
-          Add training plan
+          {isEditing ? (
+            <PencilLine className="w-4 h-4" style={{ color }} />
+          ) : (
+            <PlusCircle className="w-4 h-4" style={{ color }} />
+          )}
+          {isEditing ? 'Edit training plan' : 'Add training plan'}
         </React.Fragment>
       }
     >
@@ -147,8 +188,12 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
               id="plan-start"
               type="date"
               value={draft.startDateStr}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => update('startDateStr', event.target.value)}
-              className={inputClass}
+              onClick={openDatePicker}
+              onFocus={openDatePicker}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                update('startDateStr', event.target.value)
+              }
+              className={`${inputClass} cursor-pointer`}
             />
           </div>
           <div>
@@ -160,39 +205,30 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
               type="date"
               value={draft.raceDateStr}
               min={draft.startDateStr}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => update('raceDateStr', event.target.value)}
-              className={inputClass}
+              onClick={openDatePicker}
+              onFocus={openDatePicker}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                update('raceDateStr', event.target.value)
+              }
+              className={`${inputClass} cursor-pointer`}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelClass} htmlFor="plan-pace">
-              Target pace
-            </label>
-            <input
-              id="plan-pace"
-              type="text"
-              placeholder="e.g. 5:30 /km"
-              value={draft.targetPace}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => update('targetPace', event.target.value)}
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="plan-time">
-              Target time
-            </label>
-            <input
-              id="plan-time"
-              type="text"
-              placeholder="e.g. Sub-2:00"
-              value={draft.targetTime}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => update('targetTime', event.target.value)}
-              className={inputClass}
-            />
-          </div>
+        <div>
+          <label className={labelClass} htmlFor="plan-time">
+            Target time
+          </label>
+          <input
+            id="plan-time"
+            type="text"
+            placeholder="e.g. Sub-2:00"
+            value={draft.targetTime}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              update('targetTime', event.target.value)
+            }
+            className={inputClass}
+          />
         </div>
 
         <div>
@@ -208,13 +244,24 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
             rows={4}
             placeholder="Paste raw workout output here - bullet points, markdown tables, or plain lines. Include 'Week 1', 'Week 2' headings and a weekday per session for the most accurate dates."
             value={draft.pastedText}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => update('pastedText', event.target.value)}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+              update('pastedText', event.target.value)
+            }
             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-slate-600 font-mono"
           />
           <p className="text-[10px] text-slate-500 mt-0.5">
-            Leave blank to load the 8-week half-marathon template, dated from your start date.
+            {isEditing
+              ? 'Leave blank to keep the current sessions. Anything pasted replaces them all.'
+              : 'Leave blank to load the 8-week half-marathon template, dated from your start date.'}
           </p>
         </div>
+
+        {datesMoved && !draft.pastedText.trim() && (
+          <p className="text-[11px] text-slate-400 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2">
+            Changing the start date does not move existing sessions. Paste a new plan if you want
+            the whole schedule rebuilt.
+          </p>
+        )}
 
         {errors.length > 0 && (
           <ul className="text-xs font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2 space-y-1">
@@ -245,7 +292,7 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
             className="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-lg transition hover:brightness-110"
             style={{ backgroundColor: color }}
           >
-            Save and activate
+            {isEditing ? 'Save changes' : 'Save and activate'}
           </button>
         </div>
       </form>

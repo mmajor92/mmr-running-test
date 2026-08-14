@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { groupByWeek, sortedWeekNumbers, sumKm } from '../lib/workouts';
+import { buildStravaTitle } from '../lib/strava';
 import { WeekHeading } from './WeekHeading';
 import { WorkoutCard } from './WorkoutCard';
 import type { CopyState } from './WorkoutCard';
@@ -8,6 +9,8 @@ import type { Workout } from '../types';
 export interface WorkoutListProps {
   workouts: readonly Workout[];
   todayStr: string;
+  planName: string;
+  totalWeeks: number;
   expandedIds: ReadonlySet<string>;
   completedIds: ReadonlySet<string>;
   copiedId: string | null;
@@ -29,6 +32,8 @@ export interface WorkoutListProps {
 export function WorkoutList({
   workouts,
   todayStr,
+  planName,
+  totalWeeks,
   expandedIds,
   completedIds,
   copiedId,
@@ -73,6 +78,7 @@ export function WorkoutList({
                   isExpanded={expandedIds.has(workout.id)}
                   isCompleted={completedIds.has(workout.id)}
                   canComplete={workout.dateStr <= todayStr}
+                  stravaTitle={buildStravaTitle(workout, planName, totalWeeks)}
                   copyState={copyStateFor(workout.id)}
                   onToggle={onToggle}
                   onCopy={onCopy}

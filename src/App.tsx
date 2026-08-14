@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { NewPlanModal } from './components/NewPlanModal';
 import { PaceCalculator } from './components/PaceCalculator';
 import { PlanHeader } from './components/PlanHeader';
@@ -12,7 +13,13 @@ import { usePlans } from './hooks/usePlans';
 import { useToday } from './hooks/useToday';
 import { downloadICS, generateICSContent, openGoogleCalendar } from './lib/calendar';
 import { storageAvailable } from './lib/storage';
-import { computePlanStats, splitByDate, workoutsInWeek } from './lib/workouts';
+import { totalWeeksIn } from './lib/strava';
+import {
+  completedWorkoutIds,
+  computePlanStats,
+  splitByDate,
+  workoutsInWeek,
+} from './lib/workouts';
 import { ThemeProvider } from './theme/ThemeContext';
 import type { TabId, TrainingPlan, Workout } from './types';
 
@@ -24,27 +31,45 @@ const EMPTY_MESSAGES: Record<TabId, string> = {
 
 function AppContent() {
   const todayStr = useToday();
-  const { plans, activePlan, activePlanId, selectPlan, addPlan, archivePlan, deletePlan } =
-    usePlans(todayStr);
+  const {
+    plans,
+    activePlan,
+    activePlanId,
+    selectPlan,
+    addPlan,
+    updatePlan,
+    archivePlan,
+    deletePlan,
+  } = usePlans(todayStr);
 
   const [activeTab, setActiveTab] = useState<TabId>('upcoming');
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [showPlans, setShowPlans] = useState(false);
   const [showPaceCalculator, setShowPaceCalculator] = useState(false);
   const [showNewPlanModal, setShowNewPlanModal] = useState(false);
+  /** Plan id being edited, or null when the modal is creating a new one. */
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const { copiedId, failedId, copy } = useCopyToClipboard();
-  const { completedIds, toggleCompleted } = useCompletions();
+  const { overrides, setStatus } = useCompletions();
 
   // Expanded cards are per-plan. Keeping one global map meant a card stayed
   // open after switching plans whenever two plans shared a workout id.
   useEffect(() => setExpandedIds(new Set()), [activePlanId]);
 
+  // Required runs already in the past count as done unless explicitly skipped.
+  const completedIds = useMemo(
+    () => completedWorkoutIds(activePlan.workouts, overrides, todayStr),
+    [activePlan.workouts, overrides, todayStr],
+  );
+
   const stats = useMemo(
     () => computePlanStats(activePlan, todayStr, completedIds),
     [activePlan, todayStr, completedIds],
   );
+
+  const totalWeeks = useMemo(() => totalWeeksIn(activePlan), [activePlan]);
 
   const { upcoming, previous } = useMemo(
     () => splitByDate(activePlan.workouts, todayStr),
@@ -67,8 +92,8 @@ function AppContent() {
   }, []);
 
   const handleToggleCompleted = useCallback(
-    (workoutId: string) => toggleCompleted(workoutId, todayStr),
-    [toggleCompleted, todayStr],
+    (workoutId: string) => setStatus(workoutId, completedIds.has(workoutId) ? 'skipped' : 'done'),
+    [setStatus, completedIds],
   );
 
   const handleCopy = useCallback(
@@ -111,14 +136,32 @@ function AppContent() {
     [activePlan, stats.currentWeekNumber, upcoming],
   );
 
-  const handleCreatePlan = useCallback(
+  const editingPlan = useMemo(
+    () => (editingPlanId ? plans.find((plan) => plan.id === editingPlanId) : undefined),
+    [editingPlanId, plans],
+  );
+
+  const handleSavePlan = useCallback(
     (plan: TrainingPlan) => {
-      addPlan(plan);
+      if (editingPlanId) updatePlan(plan);
+      else addPlan(plan);
+
       setShowNewPlanModal(false);
+      setEditingPlanId(null);
       setShowPlans(false);
     },
-    [addPlan],
+    [editingPlanId, updatePlan, addPlan],
   );
+
+  const handleEditPlan = useCallback((planId: string) => {
+    setEditingPlanId(planId);
+    setShowNewPlanModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setShowNewPlanModal(false);
+    setEditingPlanId(null);
+  }, []);
 
   const handleArchiveActive = useCallback(
     () => archivePlan(activePlanId),
@@ -162,15 +205,21 @@ function AppContent() {
             onSelect={selectPlan}
             onDelete={deletePlan}
             onArchiveActive={handleArchiveActive}
-            onAddPlan={() => setShowNewPlanModal(true)}
+            onAddPlan={() => {
+              setEditingPlanId(null);
+              setShowNewPlanModal(true);
+            }}
+            onEditPlan={handleEditPlan}
           />
         )}
 
         {showNewPlanModal && (
           <NewPlanModal
+            key={editingPlanId ?? 'new'}
             todayStr={todayStr}
-            onClose={() => setShowNewPlanModal(false)}
-            onCreate={handleCreatePlan}
+            existingPlan={editingPlan}
+            onClose={handleCloseModal}
+            onSave={handleSavePlan}
           />
         )}
 
@@ -182,6 +231,8 @@ function AppContent() {
           <WorkoutList
             workouts={visibleWorkouts}
             todayStr={todayStr}
+            planName={activePlan.name}
+            totalWeeks={totalWeeks}
             expandedIds={expandedIds}
             completedIds={completedIds}
             copiedId={copiedId}
@@ -201,8 +252,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

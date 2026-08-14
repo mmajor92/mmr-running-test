@@ -12,6 +12,8 @@ export interface WorkoutCardProps {
   isToday: boolean;
   isExpanded: boolean;
   isCompleted: boolean;
+  /** Derived at render time, never read from the stored workout. */
+  stravaTitle: string;
   /** False for runs in the future - you cannot have done tomorrow's session. */
   canComplete: boolean;
   copyState: CopyState;
@@ -30,6 +32,7 @@ function WorkoutCardBase({
   isToday,
   isExpanded,
   isCompleted,
+  stravaTitle,
   canComplete,
   copyState,
   onToggle,
@@ -46,9 +49,9 @@ function WorkoutCardBase({
   const handleCopy = useCallback(
     (event: MouseEvent) => {
       event.stopPropagation();
-      onCopy(workout.id, workout.stravaTitle);
+      onCopy(workout.id, stravaTitle);
     },
-    [onCopy, workout.id, workout.stravaTitle],
+    [onCopy, workout.id, stravaTitle],
   );
 
   const handleCompleted = useCallback(

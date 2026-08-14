@@ -37,7 +37,6 @@ export interface Workout {
 export interface TrainingPlan {
   id: string;
   name: string;
-  targetPace: string;
   /** ISO calendar date, YYYY-MM-DD */
   startDateStr: string;
   /** ISO calendar date, YYYY-MM-DD */
@@ -58,7 +57,6 @@ export interface PlanDraft {
   name: string;
   startDateStr: string;
   raceDateStr: string;
-  targetPace: string;
   targetTime: string;
   pastedText: string;
 }
@@ -90,5 +88,11 @@ export interface PlanStats {
 
 export type WorkoutsByWeek = Record<number, Workout[]>;
 
-/** Workout id -> the date it was ticked off, as YYYY-MM-DD. */
-export type CompletionMap = Record<string, string>;
+/**
+ * An explicit choice by the runner, overriding the default.
+ * Core runs in the past are assumed done, so only exceptions get stored.
+ */
+export type CompletionState = 'done' | 'skipped';
+
+/** Workout id -> explicit override. Absent means "use the default". */
+export type CompletionMap = Record<string, CompletionState>;
