@@ -15,7 +15,7 @@ function WeekHeadingBase({ weekNumber, totalKm }: WeekHeadingProps) {
     <div className="flex items-center justify-between border-b border-slate-800 pb-2 pt-1 px-1">
       <div className="flex items-center gap-2">
         <span
-          className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
+          className="text-xs font-black uppercase tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
           style={{ backgroundColor: tint(ALPHA.tint), borderColor: tint(ALPHA.border) }}
         >
           Week {weekNumber}
