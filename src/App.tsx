@@ -214,13 +214,12 @@ function parsePastedAIPlan(rawText: string, startDateStr: string, planName: stri
     const dayName = sessionDate.toLocaleDateString('en-US', { weekday: 'short' });
     const displayDate = sessionDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-  let category: Workout['category'] = 'progression';
+    let category: Workout['category'] = 'progression';
     const lower = line.toLowerCase();
-    if (lower.includes('interval') || lower.includes('speed') || lower.includes('tempo') || lower.includes('vo2') || lower.includes('threshold')) category = 'intervals';
-    else if (lower.includes('race') || lower.includes('pb') || lower.includes('marathon')) category = 'raceday';
+    if (lower.includes('interval') || lower.includes('speed') || lower.includes('tempo') || lower.includes('vo2')) category = 'intervals';
     else if (lower.includes('long') || lower.includes('steady')) category = 'longrun';
-    else if (lower.includes('shakeout') || lower.includes('recovery') || lower.includes('rest')) category = 'shakeout';
-    else if (lower.includes('easy') || lower.includes('progression') || lower.includes('aerobic')) category = 'progression';
+    else if (lower.includes('shakeout') || lower.includes('easy') || lower.includes('rest')) category = 'shakeout';
+    else if (lower.includes('race') || lower.includes('pb') || lower.includes('marathon')) category = 'raceday';
 
     const cleanTitle = line.replace(/^[\s*\-#\d.]+/, '').trim();
 
