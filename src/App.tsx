@@ -585,7 +585,7 @@ export default function App() {
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap">
               <span className="shrink-0">{workout.dayName}, {workout.displayDate}</span>
               <span className="shrink-0">•</span>
-              <span className="shrink-0">Week {workout.weekNumber}</span>
+              <span className="shrink-0">WEEK {workout.weekNumber}</span>
             </div>
             <div className="font-extrabold text-white text-base sm:text-lg mt-0.5 truncate">{workout.workoutType}</div>
           </div>
@@ -782,7 +782,7 @@ export default function App() {
               <div className="flex justify-between items-center text-xs text-slate-300">
                 <span className="flex items-center gap-1 text-slate-300">
                   <BarChart3 className="w-3.5 h-3.5" style={{ color: themeColor }} />
-                  Week {currentWeekNum} Volume: <strong style={{ color: themeColor }}>{currentWeekKm} km</strong>
+                  WEEK {currentWeekNum} Volume: <strong style={{ color: themeColor }}>{currentWeekKm} km</strong>
                 </span>
                 <span>{totalPlanCompletedKm} / {totalPlanKm} km Total</span>
               </div>
@@ -1130,13 +1130,13 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                           <span 
-                            className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
                             }}
                           >
-                            Week {weekNum}
+                            WEEK {weekNum}
                           </span>
                         </div>
                         <div className="text-xs font-semibold text-slate-400">
@@ -1173,13 +1173,13 @@ export default function App() {
                       <div className="flex items-center gap-2">
                         {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                         <span 
-                          className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
+                          className="text-xs font-black tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                           style={{ 
                             backgroundColor: `${themeColor}26`, 
                             borderColor: `${themeColor}4d`,
                           }}
                         >
-                          Week {weekNum}
+                          WEEK {weekNum}
                         </span>
                       </div>
                       <div className="text-xs font-semibold text-slate-400">
@@ -1212,13 +1212,13 @@ export default function App() {
                         <div className="flex items-center gap-2">
                           {/* WEEK NUMBER BADGE: FADED THEME TINT BG + SLATE-300 TEXT */}
                           <span 
-                            className="text-xs font-black capitalize tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
+                            className="text-xs font-black tracking-wider text-slate-300 px-2.5 py-1 rounded-md border"
                             style={{ 
                               backgroundColor: `${themeColor}26`, 
                               borderColor: `${themeColor}4d`,
                             }}
                           >
-                            Week {weekNum}
+                            WEEK {weekNum}
                           </span>
                         </div>
                         <div className="text-xs font-semibold text-slate-400">
