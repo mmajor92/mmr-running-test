@@ -126,16 +126,11 @@ export function PlanHeader({
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500">
-            <span>
-              {stats.loggedCount} of {stats.coreCount} core runs ticked off
-            </span>
-            {stats.bonusCount > 0 && (
-              <span className="font-semibold text-emerald-400">
-                +{formatKm(stats.bonusKm)} km bonus
-              </span>
-            )}
-          </div>
+          {stats.bonusCount > 0 && (
+            <p className="text-[11px] font-semibold text-emerald-400 text-right">
+              +{formatKm(stats.bonusKm)} km bonus from optional runs
+            </p>
+          )}
         </div>
       </div>
     </header>
