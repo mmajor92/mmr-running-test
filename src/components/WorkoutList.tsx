@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { groupByWeek, isOptionalWorkout, sortedWeekNumbers, sumKm } from '../lib/workouts';
+import { groupByWeek, sortedWeekNumbers, sumKm } from '../lib/workouts';
 import { WeekHeading } from './WeekHeading';
 import { WorkoutCard } from './WorkoutCard';
 import type { CopyState } from './WorkoutCard';
@@ -72,7 +72,6 @@ export function WorkoutList({
                   isToday={workout.dateStr === todayStr}
                   isExpanded={expandedIds.has(workout.id)}
                   isCompleted={completedIds.has(workout.id)}
-                  isOptional={isOptionalWorkout(workout)}
                   canComplete={workout.dateStr <= todayStr}
                   copyState={copyStateFor(workout.id)}
                   onToggle={onToggle}
