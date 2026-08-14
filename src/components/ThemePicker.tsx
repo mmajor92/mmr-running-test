@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { THEME_COLORS } from '../constants';
 import { useDismissable } from '../hooks/useDismissable';
 import { useTheme } from '../theme/ThemeContext';

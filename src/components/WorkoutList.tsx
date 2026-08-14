@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { groupByWeek, sortedWeekNumbers, sumKm } from '../lib/workouts';
 import { WeekHeading } from './WeekHeading';
 import { WorkoutCard } from './WorkoutCard';

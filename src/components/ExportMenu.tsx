@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { BarChart3, Calendar, ChevronDown, Download, PlayCircle } from 'lucide-react';
 import { useDismissable } from '../hooks/useDismissable';
 import { useTheme } from '../theme/ThemeContext';

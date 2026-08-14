@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 import { CalendarPlus, Check, ChevronDown, ChevronUp, Copy, X } from 'lucide-react';
 import { CATEGORY_STYLES, FALLBACK_CATEGORY_STYLE } from '../constants';

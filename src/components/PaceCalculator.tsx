@@ -1,3 +1,4 @@
+import React from 'react';
 import type { ChangeEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Calculator, ChevronDown, ChevronUp } from 'lucide-react';
 import { usePaceCalculator } from '../hooks/usePaceCalculator';

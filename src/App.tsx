@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { NewPlanModal } from './components/NewPlanModal';
 import { PaceCalculator } from './components/PaceCalculator';
 import { PlanHeader } from './components/PlanHeader';

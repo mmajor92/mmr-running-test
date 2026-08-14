@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { DEFAULT_THEME_HEX, STORAGE_KEYS, THEME_COLORS } from '../constants';
 import { ALPHA, isHexColor, withAlpha } from '../lib/color';

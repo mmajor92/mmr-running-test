@@ -1,3 +1,4 @@
+import React from 'react';
 import { BarChart3, Calculator, Clock, Flame, FolderArchive, Trophy } from 'lucide-react';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import { formatKm } from '../lib/workouts';

@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import type { MouseEvent as ReactMouseEvent, ReactNode } from 'react';
 import { X } from 'lucide-react';
 

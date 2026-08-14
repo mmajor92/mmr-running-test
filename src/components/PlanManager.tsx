@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Archive, PlusCircle, Trash2 } from 'lucide-react';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import type { TrainingPlan } from '../types';

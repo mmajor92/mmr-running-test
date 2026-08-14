@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { ALPHA, useTheme } from '../theme/ThemeContext';
 import { formatKm } from '../lib/workouts';
 

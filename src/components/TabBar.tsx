@@ -1,3 +1,4 @@
+import React from 'react';
 import { TABS } from '../constants';
 import { useTheme } from '../theme/ThemeContext';
 import type { TabId } from '../types';

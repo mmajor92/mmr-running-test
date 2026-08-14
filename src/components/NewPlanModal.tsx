@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { PlusCircle, Sparkles } from 'lucide-react';
 import { createTemplateWorkouts, templateRaceDateFor } from '../data/defaultPlan';
@@ -117,10 +117,10 @@ export function NewPlanModal({ onClose, onCreate, todayStr }: NewPlanModalProps)
     <Modal
       onClose={onClose}
       title={
-        <>
+        <React.Fragment>
           <PlusCircle className="w-4 h-4" style={{ color }} />
           Add training plan
-        </>
+        </React.Fragment>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-3" noValidate>
